@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./public/assets",
+    "rootDir": "./src/configurator",
+    "declaration": false,
+    "sourceMap": false,
+    "noEmit": false,
+    "types": ["vite/client"]
+  },
+  "include": ["src/configurator/**/*"]
+}

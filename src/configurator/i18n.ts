@@ -1,0 +1,271 @@
+import { Lang } from './types';
+
+type TranslationKey =
+  | 'intro.title'
+  | 'intro.subtitle'
+  | 'intro.cta'
+  | 'step.addresses'
+  | 'step.inventory'
+  | 'step.services'
+  | 'step.summary'
+  | 'step.contact'
+  | 'address.from'
+  | 'address.to'
+  | 'address.label'
+  | 'address.placeholder'
+  | 'address.elevator'
+  | 'address.floor'
+  | 'address.longWalk'
+  | 'address.narrowStairs'
+  | 'inventory.title'
+  | 'inventory.subtitle'
+  | 'inventory.other'
+  | 'inventory.otherPlaceholder'
+  | 'services.title'
+  | 'services.disassembly'
+  | 'services.assembly'
+  | 'services.packing'
+  | 'services.materials'
+  | 'services.insurance'
+  | 'services.date'
+  | 'services.time'
+  | 'services.morning'
+  | 'services.afternoon'
+  | 'services.evening'
+  | 'materials.bubble'
+  | 'materials.stretch'
+  | 'materials.tape'
+  | 'materials.boxes_s'
+  | 'materials.boxes_m'
+  | 'materials.boxes_l'
+  | 'contact.email'
+  | 'contact.phone'
+  | 'contact.consent'
+  | 'contact.privacyLink'
+  | 'summary.title'
+  | 'summary.from'
+  | 'summary.to'
+  | 'summary.volume'
+  | 'summary.items'
+  | 'summary.itemsList'
+  | 'summary.services'
+  | 'summary.date'
+  | 'btn.next'
+  | 'btn.back'
+  | 'btn.edit'
+  | 'btn.submit'
+  | 'btn.close'
+  | 'complete.title'
+  | 'complete.message'
+  | 'error.required'
+  | 'error.email'
+  | 'error.minItems'
+  | 'error.consent'
+  | 'yes'
+  | 'no'
+  | 'floor'
+  | 'item.wardrobe'
+  | 'item.bed'
+  | 'item.sofa'
+  | 'item.diningTable'
+  | 'item.chairs'
+  | 'item.fridge'
+  | 'item.freezer'
+  | 'item.washingMachine'
+  | 'item.dishwasher'
+  | 'item.oven'
+  | 'item.microwave'
+  | 'item.tv'
+  | 'item.desk'
+  | 'item.chestOfDrawers'
+  | 'item.cupboard'
+  | 'item.bookcase'
+  | 'item.babyCot'
+  | 'item.bike'
+  | 'item.boxes_s'
+  | 'item.boxes_m'
+  | 'item.boxes_l';
+
+type Translations = Record<TranslationKey, string>;
+
+const cs: Translations = {
+  'intro.title': 'Kalkulace stěhování',
+  'intro.subtitle': 'Zjistěte orientační cenu vašeho stěhování během několika minut',
+  'intro.cta': 'Konfigurovat stěhování',
+  'step.addresses': 'Odkud a Kam',
+  'step.inventory': 'Co stěhujeme',
+  'step.services': 'Služby',
+  'step.summary': 'Shrnutí',
+  'step.contact': 'Kontakt',
+  'address.from': 'Odkud stěhujeme',
+  'address.to': 'Kam stěhujeme',
+  'address.label': 'Adresa',
+  'address.placeholder': 'Zadejte adresu...',
+  'address.elevator': 'Je k dispozici výtah?',
+  'address.floor': 'Patro',
+  'address.longWalk': 'Dlouhá vzdálenost od parkování',
+  'address.narrowStairs': 'Úzké schodiště',
+  'inventory.title': 'Co budeme stěhovat?',
+  'inventory.subtitle': 'Vyberte předměty, které chcete stěhovat',
+  'inventory.other': 'Další předměty (popište)',
+  'inventory.otherPlaceholder': 'Napište další věci, které nejsou v seznamu...',
+  'services.title': 'Doplňkové služby',
+  'services.disassembly': 'Demontáž nábytku',
+  'services.assembly': 'Montáž nábytku',
+  'services.packing': 'Balení věcí',
+  'services.materials': 'Obalové materiály',
+  'services.insurance': 'Pojištění / ochrana křehkých věcí',
+  'services.date': 'Preferované datum',
+  'services.time': 'Preferovaný čas',
+  'services.morning': 'Dopoledne (8-12h)',
+  'services.afternoon': 'Odpoledne (12-16h)',
+  'services.evening': 'Večer (16-20h)',
+  'materials.bubble': 'Bublinková fólie',
+  'materials.stretch': 'Strečová fólie',
+  'materials.tape': 'Lepicí páska',
+  'materials.boxes_s': 'Krabice S (malé)',
+  'materials.boxes_m': 'Krabice M (střední)',
+  'materials.boxes_l': 'Krabice L (velké)',
+  'contact.email': 'E-mail',
+  'contact.phone': 'Telefon (volitelné)',
+  'contact.consent': 'Souhlasím se zpracováním osobních údajů',
+  'contact.privacyLink': 'Zásady ochrany osobních údajů',
+  'summary.title': 'Shrnutí vaší poptávky',
+  'summary.from': 'Z adresy',
+  'summary.to': 'Na adresu',
+  'summary.volume': 'Odhadovaný objem',
+  'summary.items': 'Předměty',
+  'summary.itemsList': 'Seznam vybraných věcí',
+  'summary.services': 'Služby',
+  'summary.date': 'Termín',
+  'btn.next': 'Další',
+  'btn.back': 'Zpět',
+  'btn.edit': 'Upravit',
+  'btn.submit': 'Odeslat poptávku',
+  'btn.close': 'Zavřít',
+  'complete.title': 'Děkujeme!',
+  'complete.message': 'Vaši poptávku jsme obdrželi. Cenovou nabídku vám pošleme co nejdříve na e-mail.',
+  'error.required': 'Toto pole je povinné',
+  'error.email': 'Zadejte platnou e-mailovou adresu',
+  'error.minItems': 'Vyberte alespoň jeden předmět nebo vyplňte pole "Další předměty"',
+  'error.consent': 'Musíte souhlasit se zpracováním osobních údajů',
+  'yes': 'Ano',
+  'no': 'Ne',
+  'floor': 'patro',
+  'item.wardrobe': 'Šatní skříň',
+  'item.bed': 'Postel',
+  'item.sofa': 'Pohovka',
+  'item.diningTable': 'Jídelní stůl',
+  'item.chairs': 'Židle',
+  'item.fridge': 'Lednice',
+  'item.freezer': 'Mraznička',
+  'item.washingMachine': 'Pračka',
+  'item.dishwasher': 'Myčka',
+  'item.oven': 'Trouba',
+  'item.microwave': 'Mikrovlnka',
+  'item.tv': 'Televize',
+  'item.desk': 'Psací stůl',
+  'item.chestOfDrawers': 'Komoda',
+  'item.cupboard': 'Skříňka',
+  'item.bookcase': 'Knihovna',
+  'item.babyCot': 'Dětská postýlka',
+  'item.bike': 'Kolo',
+  'item.boxes_s': 'Krabice S',
+  'item.boxes_m': 'Krabice M',
+  'item.boxes_l': 'Krabice L',
+};
+
+const en: Translations = {
+  'intro.title': 'Moving Calculator',
+  'intro.subtitle': 'Get an estimate for your move in just a few minutes',
+  'intro.cta': 'Configure Your Move',
+  'step.addresses': 'Addresses',
+  'step.inventory': 'What to Move',
+  'step.services': 'Services',
+  'step.summary': 'Summary',
+  'step.contact': 'Contact',
+  'address.from': 'Moving From',
+  'address.to': 'Moving To',
+  'address.label': 'Address',
+  'address.placeholder': 'Enter address...',
+  'address.elevator': 'Elevator available?',
+  'address.floor': 'Floor',
+  'address.longWalk': 'Long distance from parking',
+  'address.narrowStairs': 'Narrow staircase',
+  'inventory.title': 'What are we moving?',
+  'inventory.subtitle': 'Select the items you want to move',
+  'inventory.other': 'Other items (describe)',
+  'inventory.otherPlaceholder': 'List any items not included above...',
+  'services.title': 'Additional Services',
+  'services.disassembly': 'Furniture disassembly',
+  'services.assembly': 'Furniture assembly',
+  'services.packing': 'Packing service',
+  'services.materials': 'Packing materials',
+  'services.insurance': 'Insurance / protection for fragile items',
+  'services.date': 'Preferred date',
+  'services.time': 'Preferred time',
+  'services.morning': 'Morning (8am-12pm)',
+  'services.afternoon': 'Afternoon (12pm-4pm)',
+  'services.evening': 'Evening (4pm-8pm)',
+  'materials.bubble': 'Bubble wrap',
+  'materials.stretch': 'Stretch film',
+  'materials.tape': 'Packing tape',
+  'materials.boxes_s': 'Small boxes',
+  'materials.boxes_m': 'Medium boxes',
+  'materials.boxes_l': 'Large boxes',
+  'contact.email': 'Email',
+  'contact.phone': 'Phone (optional)',
+  'contact.consent': 'I agree to the processing of personal data',
+  'contact.privacyLink': 'Privacy Policy',
+  'summary.title': 'Your Move Summary',
+  'summary.from': 'From',
+  'summary.to': 'To',
+  'summary.volume': 'Estimated volume',
+  'summary.items': 'Items',
+  'summary.itemsList': 'List of chosen items',
+  'summary.services': 'Services',
+  'summary.date': 'Date',
+  'btn.next': 'Next',
+  'btn.back': 'Back',
+  'btn.edit': 'Edit',
+  'btn.submit': 'Submit Request',
+  'btn.close': 'Close',
+  'complete.title': 'Thank You!',
+  'complete.message': 'We have received your request. We will send you a quote via email as soon as possible.',
+  'error.required': 'This field is required',
+  'error.email': 'Please enter a valid email address',
+  'error.minItems': 'Select at least one item or fill in "Other items"',
+  'error.consent': 'You must agree to the processing of personal data',
+  'yes': 'Yes',
+  'no': 'No',
+  'floor': 'floor',
+  'item.wardrobe': 'Wardrobe',
+  'item.bed': 'Bed',
+  'item.sofa': 'Sofa',
+  'item.diningTable': 'Dining table',
+  'item.chairs': 'Chairs',
+  'item.fridge': 'Refrigerator',
+  'item.freezer': 'Freezer',
+  'item.washingMachine': 'Washing machine',
+  'item.dishwasher': 'Dishwasher',
+  'item.oven': 'Oven',
+  'item.microwave': 'Microwave',
+  'item.tv': 'TV',
+  'item.desk': 'Desk',
+  'item.chestOfDrawers': 'Chest of drawers',
+  'item.cupboard': 'Cupboard',
+  'item.bookcase': 'Bookcase',
+  'item.babyCot': 'Baby cot',
+  'item.bike': 'Bicycle',
+  'item.boxes_s': 'Small boxes',
+  'item.boxes_m': 'Medium boxes',
+  'item.boxes_l': 'Large boxes',
+};
+
+export function t(lang: Lang, key: TranslationKey): string {
+  return lang === 'cs' ? cs[key] : en[key];
+}
+
+export function getTranslations(lang: Lang): Translations {
+  return lang === 'cs' ? cs : en;
+}
