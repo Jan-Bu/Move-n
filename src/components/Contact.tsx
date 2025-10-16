@@ -92,7 +92,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-3">✓</span>
-                  <span>Pojištění nákladu do 1 milionu Kč</span>
+                  <span>Pojištění nákladu</span>
                 </li>
                 <li className="flex items-start">
                   <span className="mr-3">✓</span>

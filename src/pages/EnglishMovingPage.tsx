@@ -70,7 +70,7 @@ export default function EnglishMovingPage() {
             <span className="block text-[#56A4A0] mt-2">With MOVE-N</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-800 mb-8 max-w-4xl mx-auto animate-slide-up">
-            We provide professional moving services not only throughout the Czech Republic but also to neighboring countries such as Germany, Austria, Slovakia, and Poland. Whether you're moving a flat, office, or an entire household, our experienced team will handle everything safely and efficiently.
+            We provide professional moving services not only throughout the Czech Republic but also to neighboring countries such as Germany, Austria, Slovakia, and other countries. Whether you're moving a flat, office, or an entire household, our experienced team will handle everything safely and efficiently.
           </p>
           <a
             href="#contact"
@@ -122,7 +122,7 @@ export default function EnglishMovingPage() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Fully Insured</h3>
               <p className="text-gray-700 leading-relaxed">
-                All moves are fully insured up to 1 million CZK, giving you peace of mind that your belongings are protected throughout the journey.
+                All moves are fully insured, giving you peace of mind that your belongings are protected throughout the journey.
               </p>
             </div>
           </div>
@@ -136,13 +136,13 @@ export default function EnglishMovingPage() {
           </h2>
           <div className="prose prose-lg max-w-none text-gray-700 space-y-4">
             <p>
-              Moving across borders doesn't have to be complicated. We specialize in international relocations between the Czech Republic and neighboring countries including Germany, Austria, Slovakia, and Poland. Our experienced team handles all the logistics, customs documentation, and coordination to ensure your move goes smoothly.
+              Moving across borders doesn't have to be complicated. We specialize in international relocations between the Czech Republic and neighboring countries including Germany, Austria, Slovakia, and other countries. Our experienced team handles all the logistics, customs documentation, and coordination to ensure your move goes smoothly.
             </p>
             <p>
               We offer a full range of vehicle sizes to accommodate everything from small apartment moves to large household relocations. Our modern fleet is equipped with GPS tracking and specialized equipment for securing furniture and fragile items during transport. Every vehicle is regularly inspected and maintained to the highest standards.
             </p>
             <p>
-              Insurance coverage is included with every international move, protecting your belongings up to 1 million CZK. We also provide temporary storage solutions if you need time between moving out and moving in. Our multilingual team can communicate in Czech, English, German, and Slovak to ensure clear communication throughout your move.
+              Insurance coverage is included with every international move, protecting your belongings with insurance. We also provide temporary storage solutions if you need time between moving out and moving in. Our multilingual team can communicate in Czech, English, German, and Slovak to ensure clear communication throughout your move.
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@ export default function EnglishMovingPage() {
                   </li>
                   <li className="flex items-start">
                     <span className="mr-3">✓</span>
-                    <span>Full insurance coverage up to 1 million CZK</span>
+                    <span>Full insurance coverage</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-3">✓</span>
@@ -220,7 +220,7 @@ export default function EnglishMovingPage() {
                   </li>
                   <li className="flex items-start">
                     <span className="mr-3">✓</span>
-                    <span>Multilingual team (Czech, English, German, Slovak)</span>
+                    <span>Multilingual team (Czech, English, Slovak)</span>
                   </li>
                 </ul>
               </div>

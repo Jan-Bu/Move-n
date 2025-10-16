@@ -80,16 +80,19 @@ export default function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className={isVisible ? 'animate-slide-in-left' : 'opacity-0'}>
             <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-              O <span className="text-green-800">MOVE-N</span>
+            <span className="text-green-800">MOVE-N <br></br> Moving with Hearth</span>
             </h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Jsme profesionální stěhovací společnost s více než 15letou zkušeností na českém trhu.
-              Specializujeme se na komplexní stěhovací služby pro domácnosti i firmy.
+              Jsme profesionální stěhovací firma z České republiky, která nabízí kompletní stěhovací služby s důrazem na kvalitu, pečlivost a lidský přístup.
+              Zajišťujeme stěhování bytů, domů i kanceláří, a to nejen v Praze, Hradci Králové a Pardubicích, ale i po celé České republice a v zahraničí.
             </p>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-              Naším cílem je poskytnout bezpečné, rychlé a bezproblémové stěhování s důrazem na
-              spokojenost zákazníka. Každé stěhování bereme jako jedinečné a přizpůsobujeme naše
-              služby individuálním potřebám klientů.
+              Víme, že stěhování není jen o přesunu věcí. Je to změna, která si zaslouží klid, pořádek a jistotu, že o vše bude postaráno.
+              Proto nabízíme balení a vybalení nábytku, montáž a demontáž, úklid po stěhování i lehké opravy. Postaráme se o vše, co pomůže k hladkému průběhu a vašemu pohodlí.
+            </p>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              Stěhujete se?
+              My vám zabalíme, rozmontujeme a smontujeme, co je potřeba, opravíme drobnosti ve starém bytě, uklidíme, převezeme a v novém domově zase vše připravíme tak, abyste se mohli rovnou nastěhovat a začít novou kapitolu.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">

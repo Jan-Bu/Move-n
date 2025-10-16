@@ -11,7 +11,6 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import SEO from '../components/SEO';
 import FAQ from '../components/FAQ';
-import NearbyCities from '../components/NearbyCities';
 import StructuredData, { getMovingCompanySchema, getFAQSchema } from '../components/StructuredData';
 
 export default function CityPage() {
@@ -115,7 +114,6 @@ export default function CityPage() {
 
       <Reviews />
       <FAQ items={city.faq} cityName={city.name} />
-      <NearbyCities nearbyCitySlugs={city.nearbyCities} currentCityName={city.name} />
       <Cities />
       <Contact cityName={city.name} />
       <Footer />

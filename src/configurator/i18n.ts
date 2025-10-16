@@ -15,7 +15,6 @@ type TranslationKey =
   | 'address.placeholder'
   | 'address.elevator'
   | 'address.floor'
-  | 'address.longWalk'
   | 'address.narrowStairs'
   | 'inventory.title'
   | 'inventory.subtitle'
@@ -103,7 +102,6 @@ const cs: Translations = {
   'address.placeholder': 'Zadejte adresu...',
   'address.elevator': 'Je k dispozici výtah?',
   'address.floor': 'Patro',
-  'address.longWalk': 'Dlouhá vzdálenost od parkování',
   'address.narrowStairs': 'Úzké schodiště',
   'inventory.title': 'Co budeme stěhovat?',
   'inventory.subtitle': 'Vyberte předměty, které chcete stěhovat',
@@ -190,7 +188,6 @@ const en: Translations = {
   'address.placeholder': 'Enter address...',
   'address.elevator': 'Elevator available?',
   'address.floor': 'Floor',
-  'address.longWalk': 'Long distance from parking',
   'address.narrowStairs': 'Narrow staircase',
   'inventory.title': 'What are we moving?',
   'inventory.subtitle': 'Select the items you want to move',

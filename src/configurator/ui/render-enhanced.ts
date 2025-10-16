@@ -149,13 +149,6 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   fromFloor.max = '20';
   fromSection.appendChild(createFormGroup(t(state.lang, 'address.floor'), fromFloor));
 
-  fromSection.appendChild(
-    createCheckbox(
-      state.from.longWalk || false,
-      (val) => stateManager.updateState({ from: { ...state.from, longWalk: val } }),
-      t(state.lang, 'address.longWalk')
-    )
-  );
 
   fromSection.appendChild(
     createCheckbox(
@@ -204,13 +197,6 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   toFloor.max = '20';
   toSection.appendChild(createFormGroup(t(state.lang, 'address.floor'), toFloor));
 
-  toSection.appendChild(
-    createCheckbox(
-      state.to.longWalk || false,
-      (val) => stateManager.updateState({ to: { ...state.to, longWalk: val } }),
-      t(state.lang, 'address.longWalk')
-    )
-  );
 
   toSection.appendChild(
     createCheckbox(

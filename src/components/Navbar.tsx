@@ -42,7 +42,7 @@ export default function Navbar() {
                 isScrolled ? 'text-green-800' : 'text-green-600'
               } group-hover:text-green-800`}
             >
-              MOVE-N
+              MOVE-N Moving with Hearth
             </span>
           </a>
 

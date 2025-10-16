@@ -19,7 +19,6 @@ function getDefaultAddress() {
     address: "",
     elevator: false,
     floor: 0,
-    longWalk: false,
     narrowStairs: false
   };
 }
@@ -201,7 +200,6 @@ var cs = {
   "address.placeholder": "Zadejte adresu...",
   "address.elevator": "Je k dispozici v\xFDtah?",
   "address.floor": "Patro",
-  "address.longWalk": "Dlouh\xE1 vzd\xE1lenost od parkov\xE1n\xED",
   "address.narrowStairs": "\xDAzk\xE9 schodi\u0161t\u011B",
   "inventory.title": "Co budeme st\u011Bhovat?",
   "inventory.subtitle": "Vyberte p\u0159edm\u011Bty, kter\xE9 chcete st\u011Bhovat",
@@ -287,7 +285,6 @@ var en = {
   "address.placeholder": "Enter address...",
   "address.elevator": "Elevator available?",
   "address.floor": "Floor",
-  "address.longWalk": "Long distance from parking",
   "address.narrowStairs": "Narrow staircase",
   "inventory.title": "What are we moving?",
   "inventory.subtitle": "Select the items you want to move",
@@ -1365,13 +1362,6 @@ function renderAddresses(container, stateManager) {
   fromSection.appendChild(createFormGroup(t(state.lang, "address.floor"), fromFloor));
   fromSection.appendChild(
     createCheckbox(
-      state.from.longWalk || false,
-      (val) => stateManager.updateState({ from: { ...state.from, longWalk: val } }),
-      t(state.lang, "address.longWalk")
-    )
-  );
-  fromSection.appendChild(
-    createCheckbox(
       state.from.narrowStairs || false,
       (val) => stateManager.updateState({ from: { ...state.from, narrowStairs: val } }),
       t(state.lang, "address.narrowStairs")
@@ -1411,13 +1401,6 @@ function renderAddresses(container, stateManager) {
   toFloor.min = "0";
   toFloor.max = "20";
   toSection.appendChild(createFormGroup(t(state.lang, "address.floor"), toFloor));
-  toSection.appendChild(
-    createCheckbox(
-      state.to.longWalk || false,
-      (val) => stateManager.updateState({ to: { ...state.to, longWalk: val } }),
-      t(state.lang, "address.longWalk")
-    )
-  );
   toSection.appendChild(
     createCheckbox(
       state.to.narrowStairs || false,
