@@ -1,14 +1,14 @@
 // src/configurator/services/autocomplete.ts
-// Mapy.cz Suggest integrováno s autoComplete.js (CDN).
-// Využívá dispozer pro čisté odpojení při re-renderech.
-//
-// Volání: const dispose = setupAutocomplete(input, (sel) => { ... }, { lang: 'cs' });
-// dispose() zavolej při opuštění kroku / re-renderu.
+// Mapy.cz Suggest + Geocode napojené na autoComplete.js (CDN).
+// Použití:
+//   const dispose = await setupAutocomplete(inputEl, (sel) => { ... }, { lang: 'cs' });
+//   dispose(); // při opuštění kroku / unmountu
 
 type Suggestion = {
   label: string;
-  lat?: number;
-  lon?: number;
+  sub?: string;
+  lat?: number | null;
+  lon?: number | null;
   raw?: any;
 };
 
@@ -25,30 +25,31 @@ declare global {
 }
 
 const DEFAULTS = {
-  lang: 'cs',
-  limit: 5,
+  lang: 'cs' as 'cs' | 'en',
+  limit: 8,
   minChars: 3,
 };
 
-const MAPYCZ_SUGGEST = 'https://api.mapy.cz/v1/suggest';
+const MAPY_BASE = 'https://api.mapy.cz/v1';
+// Klíč jen z .env! V prod prostředí nastav proměnnou VITE_MAPYCZ_KEY a rebuildni.
+const API_KEY = (import.meta as any).env?.VITE_MAPYCZ_KEY as string;
 
-// 1) API klíč – vem z .env, když není, můžeš dočasně vložit svůj testovací:
-const ENV_KEY = (import.meta as any).env?.VITE_MAPYCZ_KEY as string | undefined;
-// Fallback – POZOR: nenechávej v produkci, raději použij .env
-const HARDCODED_DEV_KEY =
-  'eyJpIjoyNTcsImMiOjE2Njc0ODU2MjN9.c_UlvdpHGTI_Jb-TNMYlDYuIkCLJaUpi911RdlwPsAY';
+if (!API_KEY) {
+  // Zřetelná chyba už při inicializaci – ať je hned jasné, proč live nefunguje.
+  // (Nezastaví build, jen zaloguje varování.)
+  console.warn('[autocomplete] VITE_MAPYCZ_KEY není nastavený. Mapy.cz požadavky selžou (403).');
+}
 
-const API_KEY = ENV_KEY || HARDCODED_DEV_KEY;
-
-// 2) Lazy-load CSS + JS (autoComplete.js z CDN) – jen jednou
+// ———————————————————————————————
+// Lazy-load autoComplete.js + CSS (jen jednou)
+// ———————————————————————————————
 let libLoaded: Promise<void> | null = null;
 function loadAutoCompleteLib(): Promise<void> {
   if (libLoaded) return libLoaded;
   libLoaded = new Promise<void>((resolve, reject) => {
-    // CSS
     const cssHref =
       'https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.02.min.css';
-    if (!document.querySelector(`link[data-autocomplete-css]`)) {
+    if (!document.querySelector('link[data-autocomplete-css]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = cssHref;
@@ -56,7 +57,6 @@ function loadAutoCompleteLib(): Promise<void> {
       document.head.appendChild(link);
     }
 
-    // JS
     if (window.autoComplete) {
       resolve();
       return;
@@ -72,42 +72,76 @@ function loadAutoCompleteLib(): Promise<void> {
   return libLoaded;
 }
 
-// 3) Prostý cache podle dotazu
-const queryCache = new Map<string, Array<{ value: string; data: any }>>();
+// ———————————————————————————————
+// Jednoduchý cache dle dotazu/jazyka
+// ———————————————————————————————
+const queryCache = new Map<string, Suggestion[]>();
 
-async function fetchSuggest(query: string, lang: string, limit: number) {
-  const key = `${lang}|${limit}|${query}`;
+async function fetchSuggest(q: string, lang: 'cs' | 'en', limit: number): Promise<Suggestion[]> {
+  const key = `${lang}|${limit}|${q}`;
   if (queryCache.has(key)) return queryCache.get(key)!;
+  if ((q ?? '').trim().length < 3) return [];
 
-  const url = new URL(MAPYCZ_SUGGEST);
+  const url = new URL(`${MAPY_BASE}/suggest`);
   url.searchParams.set('lang', lang);
   url.searchParams.set('limit', String(limit));
-  // Chceš jen adresy (nejčistší výsledky pro náš případ):
-  url.searchParams.set('type', 'regional.address');
-  url.searchParams.set('apikey', API_KEY);
-  url.searchParams.set('query', query);
+  url.searchParams.set('types', 'address,street,municipality'); // správně: plural "types"
+  url.searchParams.set('q', q.trim());                          // správně: "q"
 
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error('Suggest failed: ' + res.status);
+  const res = await fetch(url.toString(), {
+    mode: 'cors',
+    headers: { 'X-Mapy-Api-Key': API_KEY },
+  });
+
+  if (res.status === 403) throw new Error('MAPY_FORBIDDEN'); // referer/klíč
+  if (!res.ok) throw new Error(`MAPY_${res.status}`);
+
   const json = await res.json();
-
-  const items: Array<{ value: string; data: any }> = (json.items || []).map((item: any) => ({
-    value: item.name,
-    data: item,
+  const items: Suggestion[] = (json?.items ?? []).map((it: any) => ({
+    label: it?.title ?? '',
+    sub: it?.subtitle ?? '',
+    lat: it?.position?.lat ?? it?.center?.lat ?? null,
+    lon: it?.position?.lon ?? it?.center?.lon ?? null,
+    raw: it,
   }));
+
   queryCache.set(key, items);
   return items;
 }
 
-// 4) Veřejné API: setupAutocomplete
-export function setupAutocomplete(
+async function geocode(label: string, lang: 'cs' | 'en') {
+  const url = new URL(`${MAPY_BASE}/geocode`);
+  url.searchParams.set('lang', lang);
+  url.searchParams.set('limit', '1');
+  url.searchParams.set('q', label);
+
+  const res = await fetch(url.toString(), {
+    mode: 'cors',
+    headers: { 'X-Mapy-Api-Key': API_KEY },
+  });
+  if (!res.ok) return null;
+
+  const data = await res.json();
+  const first = data?.items?.[0];
+  if (!first) return null;
+
+  return {
+    lat: first?.position?.lat ?? first?.center?.lat ?? null,
+    lon: first?.position?.lon ?? first?.center?.lon ?? null,
+  };
+}
+
+// ———————————————————————————————
+// Veřejné API: setupAutocomplete – vrací Promise<disposer>
+// ———————————————————————————————
+export async function setupAutocomplete(
   input: HTMLInputElement,
   onSelect?: (s: Suggestion) => void,
   opts: SetupOptions = {}
-) {
+): Promise<() => void> {
   const { lang, limit, minChars } = { ...DEFAULTS, ...opts };
 
-  // Přebal UI o wrapper (autoComplete.js to vyžaduje pro styling)
+  // Zabal input do wrapperu kvůli stylům knihovny
   let wrapper: HTMLDivElement | null = null;
   if (!input.parentElement?.classList.contains('autoComplete_wrapper')) {
     wrapper = document.createElement('div');
@@ -116,138 +150,106 @@ export function setupAutocomplete(
     wrapper.appendChild(input);
   }
 
-  let acInstance: any = null;
-  let selectionHandler: any = null;
-  let destroyed = false;
+  await loadAutoCompleteLib();
 
-  const init = async () => {
-    await loadAutoCompleteLib();
-    if (destroyed) return;
-
-    // @ts-ignore
-    acInstance = new window.autoComplete({
-      selector: () => input,
-      placeHolder: input.placeholder || (lang === 'cs' ? 'Zadejte adresu…' : 'Enter your address…'),
-      threshold: minChars, // kolik znaků před hledáním
-      searchEngine: (query: string, record: string) => `<mark>${record}</mark>`,
-      data: {
-        keys: ['value'],
-        src: async (q: string) => {
-          if (!q || q.trim().length < minChars) return [];
-          try {
-            const items = await fetchSuggest(q.trim(), lang, limit);
-            // autoComplete.js občas vrátí pozdější odpověď dřív — použij aktuální vstup (cache)
-            const now = input.value.trim();
-            if (now.length >= minChars) {
-              const cachedNow = await fetchSuggest(now, lang, limit);
-              return cachedNow;
-            }
-            return items;
-          } catch {
-            return [];
-          }
-        },
-        cache: false,
+  const ac = new window.autoComplete({
+    selector: () => input,
+    placeHolder: input.placeholder || (lang === 'cs' ? 'Zadejte adresu…' : 'Enter your address…'),
+    threshold: minChars,
+    data: {
+      // Předáváme rovnou Suggestion objekty; vyhledává se v "label"
+      keys: ['label'],
+      src: async (q: string) => {
+        try {
+          return await fetchSuggest(q, lang, limit);
+        } catch (e) {
+          return [];
+        }
       },
-      resultsList: {
-        element: (list: HTMLElement, data: any) => {
-          // Bez scrollu – Mapy.cz mají krátké návrhy
-          list.style.maxHeight = 'max-content';
-          list.style.overflow = 'hidden';
+      cache: false,
+    },
+    resultsList: {
+      element: (list: HTMLElement, data: any) => {
+        list.style.maxHeight = 'max-content';
+        list.style.overflow = 'hidden';
 
-          if (!data.results.length) {
-            const msg = document.createElement('div');
-            msg.className = 'no_result';
-            msg.style.padding = '5px';
-            msg.innerHTML = `<span>${lang === 'cs' ? 'Žádné výsledky pro' : 'Found no results for'
-              } "${data.query}"</span>`;
-            list.prepend(msg);
-          } else {
-            const logoHolder = document.createElement('div');
-            const text = document.createElement('span');
-            const img = new Image();
-
-            logoHolder.style.cssText =
-              'padding:5px;display:flex;align-items:center;justify-content:end;gap:5px;font-size:12px;';
-            text.textContent = 'Powered by';
-            img.src = 'https://api.mapy.cz/img/api/logo-small.svg';
-            img.style.width = '60px';
-            logoHolder.append(text, img);
-            list.append(logoHolder);
-          }
-        },
-        noResults: true,
+        if (!data.results.length) {
+          const msg = document.createElement('div');
+          msg.className = 'no_result';
+          msg.style.padding = '6px 8px';
+          msg.textContent =
+            lang === 'cs'
+              ? 'Žádné výsledky. Zkuste upřesnit adresu.'
+              : 'No results. Try refining the address.';
+          list.prepend(msg);
+        } else {
+          const bar = document.createElement('div');
+          bar.style.cssText =
+            'padding:6px 8px;display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:12px;';
+          const s = document.createElement('span');
+          s.textContent = 'Powered by';
+          const img = new Image();
+          img.src = 'https://api.mapy.cz/img/api/logo-small.svg';
+          img.style.width = '60px';
+          bar.append(s, img);
+          list.append(bar);
+        }
       },
-      resultItem: {
-        element: (itemEl: HTMLElement, data: any) => {
-          const itemData = data.value.data;
-          const desc = document.createElement('div');
-          desc.style.cssText = 'overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
-          desc.innerHTML = `${itemData.label}, ${itemData.location}`;
-          itemEl.append(desc);
-        },
-        highlight: true,
+      noResults: true,
+    },
+    resultItem: {
+      element: (itemEl: HTMLElement, data: any) => {
+        const v: Suggestion = data.value;
+        const line = document.createElement('div');
+        line.style.cssText =
+          'display:flex;flex-direction:column;gap:2px;overflow:hidden;text-overflow:ellipsis;';
+        const main = document.createElement('div');
+        main.style.fontWeight = '600';
+        main.textContent = v.label;
+        const sub = document.createElement('div');
+        sub.style.cssText = 'font-size:12px;opacity:0.8;';
+        sub.textContent = v.sub || '';
+        line.append(main);
+        if (v.sub) line.append(sub);
+        itemEl.append(line);
       },
-    });
+      highlight: true,
+    },
+  });
 
-    async function geocodeLabel(label: string, lang: string) {
-      const url = new URL('https://api.mapy.cz/v1/geocode');
-      url.searchParams.set('query', label);
-      url.searchParams.set('limit', '1');
-      url.searchParams.set('lang', lang);
-      url.searchParams.set('apikey', API_KEY);
-      const res = await fetch(url.toString());
-      if (!res.ok) return null;
-      const json = await res.json();
-      const item = json?.items?.[0];
-      const lat = item?.position?.lat ?? item?.center?.lat;
-      const lon = item?.position?.lon ?? item?.center?.lon;
-      return (lat != null && lon != null) ? { lat, lon } : null;
+  // Výběr položky (autoComplete.js dispatchuje 'selection' na input)
+  const selectionHandler = async (event: any) => {
+    const sel: Suggestion | undefined = event?.detail?.selection?.value;
+    if (!sel) return;
+
+    input.value = sel.label;
+
+    let { lat, lon } = sel;
+    if (lat == null || lon == null) {
+      const p = await geocode(sel.label, lang);
+      if (p) {
+        lat = p.lat;
+        lon = p.lon;
+      }
     }
 
-    selectionHandler = async (event: any) => {
-      const orig = event.detail?.selection?.value?.data;
-      if (!orig) return;
+    onSelect?.({ ...sel, lat: lat ?? null, lon: lon ?? null });
+  };
 
-      input.value = orig.name;
+  input.addEventListener('selection', selectionHandler);
 
-      let lat = orig?.position?.lat ?? orig?.center?.lat ?? undefined;
-      let lon = orig?.position?.lon ?? orig?.center?.lon ?? undefined;
-
-      if (lat == null || lon == null) {
-        const p = await geocodeLabel(orig.name || orig.label, lang);
-        if (p) { lat = p.lat; lon = p.lon; }
+  // ——— disposer ———
+  return () => {
+    try {
+      input.removeEventListener('selection', selectionHandler as any);
+    } catch {}
+    try {
+      const list = document.querySelector('.autoComplete_result_list');
+      if (list && list.parentElement) list.parentElement.removeChild(list);
+      if (wrapper && wrapper.parentElement) {
+        wrapper.parentElement.insertBefore(input, wrapper);
+        wrapper.remove();
       }
-
-      onSelect?.({
-        label: orig.name || orig.label,
-        lat,
-        lon,
-        raw: orig,
-      });
-    };
-
-      if (selectionHandler) {
-        input.addEventListener('selection', selectionHandler);
-      }
-  
-      // ------- disposer -------
-      return () => {
-        destroyed = true;
-        try {
-          if (selectionHandler) input.removeEventListener('selection', selectionHandler as any);
-        } catch { }
-        try {
-          const list = document.querySelector('.autoComplete_result_list');
-          if (list && list.parentElement) list.parentElement.removeChild(list);
-        
-          if (wrapper && wrapper.parentElement) {
-            wrapper.parentElement.insertBefore(input, wrapper);
-            wrapper.remove();
-          }
-        } catch { }
-      };
-    }
-  
-    return init();
-  }
+    } catch {}
+  };
+}
