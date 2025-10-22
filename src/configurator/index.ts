@@ -12,6 +12,28 @@ let currentRoot: HTMLElement | null = null;
 let stateManager: StateManager | null = null;
 let rafId: number | null = null;
 
+/* ----------------------- Scroll helpers ----------------------- */
+function scrollConfiguratorToTop(root: HTMLElement) {
+  // Sticky header (pokud nějaký používáš, dej mu klidně atribut data-sticky-header)
+  const sticky =
+    document.querySelector<HTMLElement>('[data-sticky-header]') ||
+    document.querySelector<HTMLElement>('.site-header.is-sticky') ||
+    document.querySelector<HTMLElement>('header.sticky');
+
+  const offset = sticky ? sticky.getBoundingClientRect().height : 0;
+
+  const y = root.getBoundingClientRect().top + window.scrollY - offset - 12;
+  // Smooth – UX přívětivější; pokud chceš instantně, změň na behavior: 'auto'
+  window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
+function scrollAfterRender(root: HTMLElement) {
+  // 1. rAF – počkej, až proběhne náš render plánovaný v safeRender()
+  // 2. setTimeout(0) – nech DOM vykreslit layout, a pak posuň
+  requestAnimationFrame(() => setTimeout(() => scrollConfiguratorToTop(root), 0));
+}
+
+/* ----------------------- Render orchestration ----------------------- */
 function safeRender() {
   if (!currentRoot || !stateManager) return;
   if (rafId != null) cancelAnimationFrame(rafId);
@@ -31,7 +53,22 @@ function mount(root: HTMLElement) {
 
   root.setAttribute(INIT_ATTR, 'true');
   stateManager = new StateManager(lang, pageSlug);
-  stateManager.subscribe(() => safeRender());
+
+  // --- sledování změny kroku: po každé změně kroku posuň na začátek konfigurátoru ---
+  let prevStep: number | null = null;
+  stateManager.subscribe(() => {
+    const state = stateManager!.getState();
+    const stepChanged = prevStep === null ? false : prevStep !== state.currentStep;
+
+    safeRender();
+
+    if (stepChanged) {
+      // posuň až po renderu
+      scrollAfterRender(root);
+    }
+
+    prevStep = state.currentStep;
+  });
 
   currentRoot = root;
   safeRender();
@@ -113,9 +150,4 @@ if (import.meta && (import.meta as any).hot) {
     observer.disconnect();
     unmount();
   });
-}
-
-// volitelně: ruční bootstrap
-export function bootstrapConfigurator() {
-  initIfReady();
 }

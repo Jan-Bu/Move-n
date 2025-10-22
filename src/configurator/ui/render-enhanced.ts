@@ -16,7 +16,6 @@ import { validateAndShow, clearErrors } from './validation';
 import { setupAutocomplete } from '../services/autocomplete';
 import { trackStepView } from '../services/analytics';
 import { submitQuote } from '../services/submit';
-import { calculateTotalVolume } from '../data/volumes';
 import { rooms } from '../data/rooms';
 
 const VISIBLE_STEPS = [
@@ -60,7 +59,7 @@ function cleanupAll() {
   for (const d of disposers) {
     try {
       d();
-    } catch {}
+    } catch { }
   }
   disposers = [];
 }
@@ -351,7 +350,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
       const stateItem = state.inventory.find((i) => i.key === item.key);
       const qty = stateItem?.qty || 0;
 
-    const card = document.createElement('div');
+      const card = document.createElement('div');
       card.className = 'inventory-item';
 
       const label = document.createElement('div');
@@ -360,7 +359,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
 
       const counter = createCounter(
         qty,
-        () => stateManager.addInventoryItem(item.key, tExt(state.lang, `item.${item.key}`), item.volume),
+        () => stateManager.addInventoryItem(item.key, tExt(state.lang, `item.${item.key}`), 0),
         () => stateManager.removeInventoryItem(item.key),
         (newQty) => stateManager.setInventoryQty(item.key, newQty)
       );
@@ -389,16 +388,14 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
   otherTextarea.placeholder = t(state.lang, 'inventory.otherPlaceholder');
   otherTextarea.className = 'configurator-textarea';
   otherTextarea.rows = 3;
-  otherTextarea.addEventListener('input', (e) => {
+  otherTextarea.addEventListener('change', (e) => {
+    stateManager.updateState({ other: (e.target as HTMLTextAreaElement).value });
+  });
+  otherTextarea.addEventListener('blur', (e) => {
     stateManager.updateState({ other: (e.target as HTMLTextAreaElement).value });
   });
   otherGroup.appendChild(createFormGroup(t(state.lang, 'inventory.other'), otherTextarea, 'inventory'));
   container.appendChild(otherGroup);
-
-  const volume = calculateTotalVolume(state.inventory);
-  if (Math.abs(state.estimate.volumeM3 - volume) > 0.01) {
-    stateManager.updateEstimate(volume);
-  }
 
   const volumeDisplay = document.createElement('div');
   volumeDisplay.className = 'volume-display';
@@ -618,7 +615,7 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
     const p = document.createElement('p');
     p.textContent = state.from.address;
     const p2 = document.createElement('p');
-    p2.textContent = `${state.from.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator')}, ${t(state.lang, 'floor')} ${state.from.floor}`;
+    p2.textContent = `${state.from.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator1')}, ${t(state.lang, 'floor')} ${state.from.floor}`;
     const frag = document.createDocumentFragment(); frag.append(p, p2);
     sec(t(state.lang, 'summary.from'), frag);
   }
@@ -628,7 +625,7 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
     const p = document.createElement('p');
     p.textContent = state.to.address;
     const p2 = document.createElement('p');
-    p2.textContent = `${state.to.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator')}, ${t(state.lang, 'floor')} ${state.to.floor}`;
+    p2.textContent = `${state.to.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator1')}, ${t(state.lang, 'floor')} ${state.to.floor}`;
     const frag = document.createDocumentFragment(); frag.append(p, p2);
     sec(t(state.lang, 'summary.to'), frag);
   }
@@ -637,12 +634,6 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
     const p = document.createElement('p');
     p.textContent = `${state.distance} km`;
     sec(tExt(state.lang, 'distance.result'), p);
-  }
-
-  {
-    const p = document.createElement('p');
-    p.textContent = `${state.estimate.volumeM3.toFixed(1)} m³`;
-    sec(t(state.lang, 'summary.volume'), p);
   }
 
   // Items
