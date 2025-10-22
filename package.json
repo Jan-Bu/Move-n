@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:vite && npm run build:configurator",
-    "build:vite": "vite build",
-    "build:configurator": "esbuild src/configurator/index.ts --bundle --outfile=public/assets/configurator.js --format=esm --target=es2020 && cp src/configurator/configurator.css public/assets/configurator.css && mkdir -p dist/assets && cp public/assets/configurator.* dist/assets/",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
@@ -25,7 +23,6 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.18",
-    "esbuild": "^0.25.10",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",

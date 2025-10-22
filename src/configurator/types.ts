@@ -14,6 +14,9 @@ export interface InventoryItem {
   key: string;
   label: string;
   qty: number;
+  /**
+   * m³ per unit (optional, pokud je k dispozici pro odhad objemu)
+   */
   volumePerUnit?: number;
 }
 
@@ -35,6 +38,7 @@ export interface Services {
 }
 
 export interface Estimate {
+  /** Odhadovaný objem v m³ */
   volumeM3: number;
 }
 
@@ -45,10 +49,26 @@ export interface PhotoFile {
   type: string;
 }
 
+export const STEPS = {
+  INTRO: 0,
+  ADDRESSES: 1,
+  INVENTORY: 2,
+  SERVICES: 3,
+  SUMMARY: 4,
+  CONTACT: 5,
+  COMPLETE: 6
+} as const;
+
+/**
+ * Klíč a hodnota kroků (pro přesné typování v UI/logice routeru)
+ */
+export type StepKey = keyof typeof STEPS;
+export type StepId = (typeof STEPS)[StepKey];
+
 export interface ConfiguratorState {
   lang: Lang;
   pageSlug: string;
-  currentStep: number;
+  currentStep: number; // nebo StepId, pokud chceš přísnější typ
   from: EndpointAddress;
   to: EndpointAddress;
   distance?: number;
@@ -64,36 +84,23 @@ export interface ConfiguratorState {
   consent: boolean;
 }
 
-export interface Payload {
-  lang: Lang;
-  pageSlug: string;
-  from: EndpointAddress;
-  to: EndpointAddress;
-  distance?: number;
-  inventory: InventoryItem[];
-  other?: string;
-  photos: PhotoFile[];
-  services: Services;
-  estimate: Estimate;
-  preferredDate?: string;
-  preferredWindow?: TimeWindow;
-  email: string;
-  phone?: string;
-  consent: boolean;
-  timestamp: string;
-}
-
 export interface ValidationError {
   field: string;
   message: string;
 }
 
-export const STEPS = {
-  INTRO: 0,
-  ADDRESSES: 1,
-  INVENTORY: 2,
-  SERVICES: 3,
-  SUMMARY: 4,
-  CONTACT: 5,
-  COMPLETE: 6
-} as const;
+/**
+ * Payload pro odeslání (odvozené z ConfiguratorState, aby nedocházelo k driftu).
+ * - některá pole jsou volitelná proti stavu (preferredDate/Window, phone, other)
+ * - přidán timestamp
+ */
+export type Payload = Omit<
+  ConfiguratorState,
+  'currentStep' | 'preferredWindow' | 'preferredDate' | 'phone' | 'consent'
+> & {
+  preferredDate?: string;
+  preferredWindow?: TimeWindow;
+  phone?: string;
+  other?: string;
+  timestamp: string;
+};

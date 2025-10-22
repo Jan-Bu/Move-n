@@ -80,7 +80,7 @@ export default function About() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className={isVisible ? 'animate-slide-in-left' : 'opacity-0'}>
             <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
-            <span className="text-green-800">MOVE-N <br></br> Moving with Hearth</span>
+            <span className="text-green-800">MOVE-N <br></br> Moving with heart</span>
             </h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
               Jsme profesionální stěhovací firma z České republiky, která nabízí kompletní stěhovací služby s důrazem na kvalitu, pečlivost a lidský přístup.

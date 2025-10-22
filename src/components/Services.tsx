@@ -40,8 +40,8 @@ export default function Services() {
     },
     {
       icon: Truck,
-      title: 'Přeprava Nábytku',
-      description: 'Bezpečná přeprava velkých a těžkých předmětů',
+      title: 'Demontáž a Montáž Nábytku',
+      description: 'Odborná demontáž, přeprava a opětovná montáž vašeho nábytku',
     },
     {
       icon: Shield,
@@ -63,7 +63,7 @@ export default function Services() {
             Naše <span className="text-green-800">Služby</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Poskytujeme komplexní stěhovací služby přizpůsobené vašim potřebám
+            Poskytujeme komplexní stěhovací služby přizpůsobené vašim potřebám včetně stěhování do zahraničí.
           </p>
         </div>
 

@@ -1,6 +1,8 @@
-import { Lang } from './types';
+import type { Lang } from './types';
 
-export const translations = {
+type Dict = Record<string, string>;
+
+export const translations: Record<Lang, Dict> = {
   cs: {
     // Rooms
     'room.livingRoom': 'Obývací pokoj',
@@ -87,7 +89,7 @@ export const translations = {
     'item.kidsChair': 'Dětská židle',
     'item.highChair': 'Vysoká židle',
     'item.playpen': 'Ohrádka',
-    'item.rocking chair': 'Houpací křeslo',
+    'item.rockingChair': 'Houpací křeslo',
 
     // Garage Items
     'item.bike': 'Kolo',
@@ -215,7 +217,7 @@ export const translations = {
     'item.kidsChair': 'Kids Chair',
     'item.highChair': 'High Chair',
     'item.playpen': 'Playpen',
-    'item.rocking chair': 'Rocking Chair',
+    'item.rockingChair': 'Rocking Chair',
 
     // Garage Items
     'item.bike': 'Bicycle',
@@ -259,5 +261,7 @@ export const translations = {
 };
 
 export function tExt(lang: Lang, key: string): string {
-  return translations[lang][key] || key;
+  const dict = translations[lang];
+  // CZ/EN fallback a nakonec samotný klíč
+  return dict[key] ?? translations.en[key] ?? key;
 }

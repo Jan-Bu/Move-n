@@ -1,93 +1,7 @@
-import { Lang } from './types';
+import type { Lang } from './types';
 
-type TranslationKey =
-  | 'intro.title'
-  | 'intro.subtitle'
-  | 'intro.cta'
-  | 'step.addresses'
-  | 'step.inventory'
-  | 'step.services'
-  | 'step.summary'
-  | 'step.contact'
-  | 'address.from'
-  | 'address.to'
-  | 'address.label'
-  | 'address.placeholder'
-  | 'address.elevator'
-  | 'address.floor'
-  | 'address.narrowStairs'
-  | 'inventory.title'
-  | 'inventory.subtitle'
-  | 'inventory.other'
-  | 'inventory.otherPlaceholder'
-  | 'services.title'
-  | 'services.disassembly'
-  | 'services.assembly'
-  | 'services.packing'
-  | 'services.materials'
-  | 'services.insurance'
-  | 'services.date'
-  | 'services.time'
-  | 'services.morning'
-  | 'services.afternoon'
-  | 'services.evening'
-  | 'materials.bubble'
-  | 'materials.stretch'
-  | 'materials.tape'
-  | 'materials.boxes_s'
-  | 'materials.boxes_m'
-  | 'materials.boxes_l'
-  | 'contact.email'
-  | 'contact.phone'
-  | 'contact.consent'
-  | 'contact.privacyLink'
-  | 'summary.title'
-  | 'summary.from'
-  | 'summary.to'
-  | 'summary.volume'
-  | 'summary.items'
-  | 'summary.itemsList'
-  | 'summary.services'
-  | 'summary.date'
-  | 'btn.next'
-  | 'btn.back'
-  | 'btn.edit'
-  | 'btn.submit'
-  | 'btn.close'
-  | 'complete.title'
-  | 'complete.message'
-  | 'error.required'
-  | 'error.email'
-  | 'error.minItems'
-  | 'error.consent'
-  | 'yes'
-  | 'no'
-  | 'floor'
-  | 'item.wardrobe'
-  | 'item.bed'
-  | 'item.sofa'
-  | 'item.diningTable'
-  | 'item.chairs'
-  | 'item.fridge'
-  | 'item.freezer'
-  | 'item.washingMachine'
-  | 'item.dishwasher'
-  | 'item.oven'
-  | 'item.microwave'
-  | 'item.tv'
-  | 'item.desk'
-  | 'item.chestOfDrawers'
-  | 'item.cupboard'
-  | 'item.bookcase'
-  | 'item.babyCot'
-  | 'item.bike'
-  | 'item.boxes_s'
-  | 'item.boxes_m'
-  | 'item.boxes_l';
 
-type Translations = Record<TranslationKey, string>;
-
-const cs: Translations = {
+const cs = {
   'intro.title': 'Kalkulace stěhování',
   'intro.subtitle': 'Zjistěte orientační cenu vašeho stěhování během několika minut',
   'intro.cta': 'Konfigurovat stěhování',
@@ -171,9 +85,14 @@ const cs: Translations = {
   'item.boxes_s': 'Krabice S',
   'item.boxes_m': 'Krabice M',
   'item.boxes_l': 'Krabice L',
-};
+} as const;
 
-const en: Translations = {
+
+export type TranslationKey = keyof typeof cs;
+type Translations = Record<TranslationKey, string>;
+
+
+const en = {
   'intro.title': 'Moving Calculator',
   'intro.subtitle': 'Get an estimate for your move in just a few minutes',
   'intro.cta': 'Configure Your Move',
@@ -257,12 +176,14 @@ const en: Translations = {
   'item.boxes_s': 'Small boxes',
   'item.boxes_m': 'Medium boxes',
   'item.boxes_l': 'Large boxes',
-};
+} satisfies Translations;
 
+// 4) API
 export function t(lang: Lang, key: TranslationKey): string {
-  return lang === 'cs' ? cs[key] : en[key];
+
+  return (lang === 'cs' ? cs[key] : en[key]) ?? en[key] ?? (key as string);
 }
 
-export function getTranslations(lang: Lang): Translations {
-  return lang === 'cs' ? cs : en;
+export function getTranslations(lang: Lang): Readonly<Translations> {
+  return (lang === 'cs' ? cs : en) as Readonly<Translations>;
 }

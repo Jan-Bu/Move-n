@@ -1,3 +1,4 @@
+// src/configurator/ui/renderer.ts
 import { ConfiguratorState, STEPS, PhotoFile } from '../types';
 import { StateManager } from '../state';
 import { t } from '../i18n';
@@ -11,14 +12,72 @@ import {
   createSelect,
   createStepper,
 } from './components';
-import { validateStep, displayErrors, clearErrors } from './validation';
+import { validateAndShow, clearErrors } from './validation';
 import { setupAutocomplete } from '../services/autocomplete';
 import { trackStepView } from '../services/analytics';
 import { submitQuote } from '../services/submit';
 import { calculateTotalVolume } from '../data/volumes';
-import { rooms, roomItems } from '../data/rooms';
+import { rooms } from '../data/rooms';
+
+const VISIBLE_STEPS = [
+  STEPS.ADDRESSES,
+  STEPS.INVENTORY,
+  STEPS.SERVICES,
+  STEPS.SUMMARY,
+  STEPS.CONTACT,
+] as const;
+
+type VisibleStep = typeof VISIBLE_STEPS[number];
+
+function isVisibleStep(x: number): x is VisibleStep {
+  return (VISIBLE_STEPS as readonly number[]).includes(x);
+}
+
+// ---------- Lifecycle cleanup (zabrání zdvojeným listenerům, „dvojkliku“ apod.) ----------
+let disposers: Array<() => void> = [];
+
+/**
+ * Přijme synchronní disposer (() => void) NEBO Promise<(() => void) | void>.
+ * Tím pádem zvládneme i knihovny, které se načítají lazy/async (autoComplete.js).
+ */
+function addDisposer(
+  d: (() => void) | Promise<(() => void) | void> | undefined
+) {
+  if (!d) return;
+  if (typeof d === 'function') {
+    disposers.push(d);
+    return;
+  }
+  // @ts-ignore – feature-detection na Promise
+  if (typeof d.then === 'function') {
+    (d as Promise<(() => void) | void>).then((fn) => {
+      if (typeof fn === 'function') disposers.push(fn);
+    });
+  }
+}
+
+function cleanupAll() {
+  for (const d of disposers) {
+    try {
+      d();
+    } catch {}
+  }
+  disposers = [];
+}
+
+function renderStepper(container: HTMLElement, state: ConfiguratorState) {
+  const visualIndex = isVisibleStep(state.currentStep)
+    ? VISIBLE_STEPS.indexOf(state.currentStep as VisibleStep) + 1 // 1-based index pro správné zvýraznění „1“
+    : 1;
+
+  const stepper = createStepper(visualIndex, VISIBLE_STEPS.length, state.lang);
+  container.appendChild(stepper);
+}
 
 export function render(container: HTMLElement, stateManager: StateManager): void {
+  // vždy před novým renderem uklidíme staré listenery / autocomplete / atd.
+  cleanupAll();
+
   const state = stateManager.getState();
   container.innerHTML = '';
   container.className = 'moving-configurator';
@@ -32,6 +91,7 @@ export function render(container: HTMLElement, stateManager: StateManager): void
     content.classList.add('has-step-content');
     const wrapper = document.createElement('div');
     wrapper.className = 'configurator-step-content';
+    wrapper.setAttribute('data-step', String(state.currentStep));
 
     switch (state.currentStep) {
       case STEPS.ADDRESSES:
@@ -54,11 +114,21 @@ export function render(container: HTMLElement, stateManager: StateManager): void
         break;
     }
 
+    // Enter = „Další“, ale ne v textarea
+    wrapper.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !(e.target instanceof HTMLTextAreaElement)) {
+        const next = wrapper.querySelector<HTMLButtonElement>('.configurator-nav .btn-primary');
+        if (next) {
+          e.preventDefault();
+          next.click();
+        }
+      }
+    });
+
     content.appendChild(wrapper);
   }
 
   container.appendChild(content);
-
   trackStepView(state.currentStep, getStepName(state.currentStep), state.lang, state.pageSlug);
 }
 
@@ -104,14 +174,14 @@ function renderIntro(container: HTMLElement, stateManager: StateManager): void {
 function renderAddresses(container: HTMLElement, stateManager: StateManager): void {
   const state = stateManager.getState();
 
-  const stepper = createStepper(state.currentStep, 5, state.lang);
-  container.appendChild(stepper);
+  renderStepper(container, state);
 
   const title = document.createElement('h3');
   title.textContent = t(state.lang, 'step.addresses');
   title.className = 'configurator-step-title';
   container.appendChild(title);
 
+  // FROM
   const fromSection = document.createElement('div');
   fromSection.className = 'address-section';
   const fromTitle = document.createElement('h4');
@@ -121,14 +191,27 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   const fromAddressInput = createInput(
     'text',
     state.from.address,
-    (val) => {
-      stateManager.updateState({ from: { ...state.from, address: val } });
-    },
+    (val) => stateManager.updateState({ from: { ...state.from, address: val } }),
     t(state.lang, 'address.placeholder'),
     'from.address'
   );
-  setupAutocomplete(fromAddressInput);
-  fromSection.appendChild(createFormGroup(t(state.lang, 'address.label'), fromAddressInput, 'from.address'));
+  fromAddressInput.autocomplete = 'off';
+
+  // Mapy.cz autocomplete + uložíme disposer (sync i async varianta)
+  addDisposer(
+    setupAutocomplete(
+      fromAddressInput,
+      (sel) => {
+        // volitelné: uložit lat/lon
+        // stateManager.updateState({ from: { ...state.from, lat: sel.lat, lon: sel.lon } });
+      },
+      { lang: state.lang }
+    )
+  );
+
+  fromSection.appendChild(
+    createFormGroup(t(state.lang, 'address.label'), fromAddressInput, 'from.address')
+  );
 
   fromSection.appendChild(
     createCheckbox(
@@ -147,8 +230,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   );
   fromFloor.min = '0';
   fromFloor.max = '20';
-  fromSection.appendChild(createFormGroup(t(state.lang, 'address.floor'), fromFloor));
-
+  fromSection.appendChild(createFormGroup(t(state.lang, 'address.floor'), fromFloor, 'from.floor'));
 
   fromSection.appendChild(
     createCheckbox(
@@ -160,6 +242,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
 
   container.appendChild(fromSection);
 
+  // TO
   const toSection = document.createElement('div');
   toSection.className = 'address-section';
   const toTitle = document.createElement('h4');
@@ -169,13 +252,23 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   const toAddressInput = createInput(
     'text',
     state.to.address,
-    (val) => {
-      stateManager.updateState({ to: { ...state.to, address: val } });
-    },
+    (val) => stateManager.updateState({ to: { ...state.to, address: val } }),
     t(state.lang, 'address.placeholder'),
     'to.address'
   );
-  setupAutocomplete(toAddressInput);
+  toAddressInput.autocomplete = 'off';
+
+  addDisposer(
+    setupAutocomplete(
+      toAddressInput,
+      (sel) => {
+        // volitelné: uložit lat/lon
+        // stateManager.updateState({ to: { ...state.to, lat: sel.lat, lon: sel.lon } });
+      },
+      { lang: state.lang }
+    )
+  );
+
   toSection.appendChild(createFormGroup(t(state.lang, 'address.label'), toAddressInput, 'to.address'));
 
   toSection.appendChild(
@@ -195,8 +288,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   );
   toFloor.min = '0';
   toFloor.max = '20';
-  toSection.appendChild(createFormGroup(t(state.lang, 'address.floor'), toFloor));
-
+  toSection.appendChild(createFormGroup(t(state.lang, 'address.floor'), toFloor, 'to.floor'));
 
   toSection.appendChild(
     createCheckbox(
@@ -221,8 +313,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
 function renderInventory(container: HTMLElement, stateManager: StateManager): void {
   const state = stateManager.getState();
 
-  const stepper = createStepper(state.currentStep, 5, state.lang);
-  container.appendChild(stepper);
+  renderStepper(container, state);
 
   const title = document.createElement('h3');
   title.textContent = t(state.lang, 'inventory.title');
@@ -234,7 +325,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
   subtitle.className = 'configurator-subtitle';
   container.appendChild(subtitle);
 
-  rooms.forEach((room, roomIndex) => {
+  rooms.forEach((room) => {
     const roomSection = document.createElement('div');
     roomSection.className = 'room-section room-accordion';
 
@@ -255,13 +346,12 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
 
     const grid = document.createElement('div');
     grid.className = 'inventory-grid room-content';
-    grid.style.display = 'none';
 
     room.items.forEach((item) => {
       const stateItem = state.inventory.find((i) => i.key === item.key);
       const qty = stateItem?.qty || 0;
 
-      const card = document.createElement('div');
+    const card = document.createElement('div');
       card.className = 'inventory-item';
 
       const label = document.createElement('div');
@@ -283,21 +373,10 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
     roomSection.appendChild(grid);
 
     roomHeader.addEventListener('click', () => {
-      const allRooms = container.querySelectorAll('.room-accordion');
-      allRooms.forEach((otherRoom) => {
-        if (otherRoom !== roomSection) {
-          const otherContent = otherRoom.querySelector('.room-content') as HTMLElement;
-          const otherArrow = otherRoom.querySelector('.room-arrow') as HTMLElement;
-          if (otherContent) otherContent.style.display = 'none';
-          if (otherArrow) otherArrow.style.transform = 'rotate(0deg)';
-          otherRoom.classList.remove('expanded');
-        }
+      container.querySelectorAll('.room-accordion.expanded').forEach((el) => {
+        if (el !== roomSection) el.classList.remove('expanded');
       });
-
-      const isExpanded = grid.style.display === 'grid';
-      grid.style.display = isExpanded ? 'none' : 'grid';
-      arrow.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
-      roomSection.classList.toggle('expanded', !isExpanded);
+      roomSection.classList.toggle('expanded');
     });
 
     container.appendChild(roomSection);
@@ -313,7 +392,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
   otherTextarea.addEventListener('input', (e) => {
     stateManager.updateState({ other: (e.target as HTMLTextAreaElement).value });
   });
-  otherGroup.appendChild(createFormGroup(t(state.lang, 'inventory.other'), otherTextarea));
+  otherGroup.appendChild(createFormGroup(t(state.lang, 'inventory.other'), otherTextarea, 'inventory'));
   container.appendChild(otherGroup);
 
   const volume = calculateTotalVolume(state.inventory);
@@ -351,8 +430,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
 function renderServices(container: HTMLElement, stateManager: StateManager): void {
   const state = stateManager.getState();
 
-  const stepper = createStepper(state.currentStep, 5, state.lang);
-  container.appendChild(stepper);
+  renderStepper(container, state);
 
   const title = document.createElement('h3');
   title.textContent = t(state.lang, 'services.title');
@@ -396,6 +474,7 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
 
   container.appendChild(servicesGroup);
 
+  // Photos
   const photoSection = document.createElement('div');
   photoSection.className = 'photo-section';
 
@@ -438,25 +517,32 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
   fileInput.multiple = true;
   fileInput.style.display = 'none';
   fileInput.onchange = async (e) => {
-    const target = e.target as HTMLInputElement;
+    const target = (e.target as HTMLInputElement);
     if (target.files) {
       for (let i = 0; i < target.files.length; i++) {
         const file = target.files[i];
+
+        if (file.type === 'image/heic') {
+          alert(tExt(state.lang, 'photo.heicNotice') || 'HEIC may not preview on some browsers.');
+        }
+
         if (file.size > 5 * 1024 * 1024) {
           alert(`${file.name}: ${tExt(state.lang, 'photo.maxSize')}`);
           continue;
         }
-        const reader = new FileReader();
-        reader.onload = (event) => {
+
+        try {
+          const dataUrl = await downscaleToDataUrl(file, 1600, 0.82);
           const photoFile: PhotoFile = {
             name: file.name,
-            base64: event.target?.result as string,
-            size: file.size,
-            type: file.type,
+            base64: dataUrl,
+            size: dataUrl.length,
+            type: 'image/jpeg',
           };
           stateManager.addPhoto(photoFile);
-        };
-        reader.readAsDataURL(file);
+        } catch (err) {
+          console.error('Image processing failed', err);
+        }
       }
       target.value = '';
     }
@@ -478,12 +564,18 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
 
   container.appendChild(photoSection);
 
+  // Date / Time
   const dateInput = createInput(
     'date',
     state.preferredDate,
-    (val) => stateManager.updateState({ preferredDate: val })
+    (val) => stateManager.updateState({ preferredDate: val }),
+    '',
+    'preferredDate'
   );
-  container.appendChild(createFormGroup(t(state.lang, 'services.date'), dateInput));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  dateInput.min = today.toISOString().slice(0, 10);
+  container.appendChild(createFormGroup(t(state.lang, 'services.date'), dateInput, 'preferredDate'));
 
   const timeSelect = createSelect(
     state.preferredWindow,
@@ -495,7 +587,7 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
     ],
     (val) => stateManager.updateState({ preferredWindow: val as any })
   );
-  container.appendChild(createFormGroup(t(state.lang, 'services.time'), timeSelect));
+  container.appendChild(createFormGroup(t(state.lang, 'services.time'), timeSelect, 'preferredWindow'));
 
   renderNavButtons(container, stateManager);
 }
@@ -503,60 +595,100 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
 function renderSummary(container: HTMLElement, stateManager: StateManager): void {
   const state = stateManager.getState();
 
-  const stepper = createStepper(state.currentStep, 5, state.lang);
-  container.appendChild(stepper);
+  renderStepper(container, state);
 
   const title = document.createElement('h3');
   title.textContent = t(state.lang, 'summary.title');
   title.className = 'configurator-step-title';
   container.appendChild(title);
 
-  const summaryCard = document.createElement('div');
-  summaryCard.className = 'summary-card';
+  const card = document.createElement('div');
+  card.className = 'summary-card';
 
-  let servicesHtml = '';
-  if (state.services.disassembly) servicesHtml += `<li>${t(state.lang, 'services.disassembly')}</li>`;
-  if (state.services.assembly) servicesHtml += `<li>${t(state.lang, 'services.assembly')}</li>`;
-  if (state.services.packingService) servicesHtml += `<li>${t(state.lang, 'services.packing')}</li>`;
-  if (state.services.insurance) servicesHtml += `<li>${t(state.lang, 'services.insurance')}</li>`;
+  const sec = (heading: string, body: Node) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'summary-section';
+    const h4 = document.createElement('h4'); h4.textContent = heading;
+    wrap.appendChild(h4); wrap.appendChild(body);
+    card.appendChild(wrap);
+  };
 
-  summaryCard.innerHTML = `
-    <div class="summary-section">
-      <h4>${t(state.lang, 'summary.from')}</h4>
-      <p>${state.from.address}</p>
-      <p>${state.from.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator')}, ${t(state.lang, 'floor')} ${state.from.floor}</p>
-    </div>
-    <div class="summary-section">
-      <h4>${t(state.lang, 'summary.to')}</h4>
-      <p>${state.to.address}</p>
-      <p>${state.to.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator')}, ${t(state.lang, 'floor')} ${state.to.floor}</p>
-    </div>
-    ${state.distance ? `<div class="summary-section"><h4>${tExt(state.lang, 'distance.result')}</h4><p>${state.distance} km</p></div>` : ''}
-    <div class="summary-section">
-      <h4>${t(state.lang, 'summary.volume')}</h4>
-      <p>${state.estimate.volumeM3.toFixed(1)} m³</p>
-    </div>
-    <div class="summary-section">
-      <h4>${t(state.lang, 'summary.items')}</h4>
-      <ul>
-        ${state.inventory.map((item) => `<li>${item.label}: ${item.qty}x</li>`).join('')}
-        ${state.other ? `<li>${state.other}</li>` : ''}
-      </ul>
-    </div>
-    ${servicesHtml ? `<div class="summary-section"><h4>${t(state.lang, 'summary.services')}</h4><ul>${servicesHtml}</ul></div>` : ''}
-    ${state.photos.length > 0 ? `<div class="summary-section"><h4>${tExt(state.lang, 'photo.title')}</h4><p>${state.photos.length} ${state.lang === 'cs' ? 'fotografií' : 'photos'}</p></div>` : ''}
-  `;
+  // From
+  {
+    const p = document.createElement('p');
+    p.textContent = state.from.address;
+    const p2 = document.createElement('p');
+    p2.textContent = `${state.from.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator')}, ${t(state.lang, 'floor')} ${state.from.floor}`;
+    const frag = document.createDocumentFragment(); frag.append(p, p2);
+    sec(t(state.lang, 'summary.from'), frag);
+  }
 
-  container.appendChild(summaryCard);
+  // To
+  {
+    const p = document.createElement('p');
+    p.textContent = state.to.address;
+    const p2 = document.createElement('p');
+    p2.textContent = `${state.to.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator')}, ${t(state.lang, 'floor')} ${state.to.floor}`;
+    const frag = document.createDocumentFragment(); frag.append(p, p2);
+    sec(t(state.lang, 'summary.to'), frag);
+  }
 
+  if (state.distance) {
+    const p = document.createElement('p');
+    p.textContent = `${state.distance} km`;
+    sec(tExt(state.lang, 'distance.result'), p);
+  }
+
+  {
+    const p = document.createElement('p');
+    p.textContent = `${state.estimate.volumeM3.toFixed(1)} m³`;
+    sec(t(state.lang, 'summary.volume'), p);
+  }
+
+  // Items
+  {
+    const ul = document.createElement('ul');
+    state.inventory.forEach((it) => {
+      const li = document.createElement('li');
+      li.textContent = `${it.label}: ${it.qty}x`;
+      ul.appendChild(li);
+    });
+    if (state.other) {
+      const li = document.createElement('li'); li.textContent = state.other; ul.appendChild(li);
+    }
+    sec(t(state.lang, 'summary.items'), ul);
+  }
+
+  // Services
+  {
+    const selected = [
+      state.services.disassembly && t(state.lang, 'services.disassembly'),
+      state.services.assembly && t(state.lang, 'services.assembly'),
+      state.services.packingService && t(state.lang, 'services.packing'),
+      state.services.insurance && t(state.lang, 'services.insurance'),
+    ].filter(Boolean) as string[];
+    if (selected.length) {
+      const ul = document.createElement('ul');
+      selected.forEach((s) => { const li = document.createElement('li'); li.textContent = s; ul.appendChild(li); });
+      sec(t(state.lang, 'summary.services'), ul);
+    }
+  }
+
+  // Photos
+  if (state.photos.length > 0) {
+    const p = document.createElement('p');
+    p.textContent = `${state.photos.length} ${state.lang === 'cs' ? 'fotografií' : 'photos'}`;
+    sec(tExt(state.lang, 'photo.title'), p);
+  }
+
+  container.appendChild(card);
   renderNavButtons(container, stateManager);
 }
 
 function renderContact(container: HTMLElement, stateManager: StateManager): void {
   const state = stateManager.getState();
 
-  const stepper = createStepper(state.currentStep, 5, state.lang);
-  container.appendChild(stepper);
+  renderStepper(container, state);
 
   const title = document.createElement('h3');
   title.textContent = t(state.lang, 'step.contact');
@@ -579,7 +711,7 @@ function renderContact(container: HTMLElement, stateManager: StateManager): void
     (val) => stateManager.updateState({ phone: val }),
     '+420...'
   );
-  container.appendChild(createFormGroup(t(state.lang, 'contact.phone'), phoneInput));
+  container.appendChild(createFormGroup(t(state.lang, 'contact.phone'), phoneInput, 'phone'));
 
   const consentCheckbox = createCheckbox(
     state.consent,
@@ -626,7 +758,7 @@ function renderNavButtons(container: HTMLElement, stateManager: StateManager, is
   const navContainer = document.createElement('div');
   navContainer.className = 'configurator-nav';
 
-  if (state.currentStep > STEPS.INTRO) {
+  if (state.currentStep > STEPS.INTRO && state.currentStep !== STEPS.COMPLETE) {
     const backBtn = createButton(
       t(state.lang, 'btn.back'),
       () => stateManager.prevStep(),
@@ -638,23 +770,24 @@ function renderNavButtons(container: HTMLElement, stateManager: StateManager, is
   const nextBtn = createButton(
     isSubmit ? t(state.lang, 'btn.submit') : t(state.lang, 'btn.next'),
     async () => {
-      clearErrors(container);
-      const errors = validateStep(state.currentStep, state);
+      if (nextBtn.disabled) return;
+      nextBtn.disabled = true;
 
-      if (errors.length > 0) {
-        displayErrors(errors, container);
-        return;
-      }
+      clearErrors(container);
+      const errs = validateAndShow(state.currentStep, state, container);
+      if (errs.length) { nextBtn.disabled = false; return; }
 
       if (isSubmit) {
-        const result = await submitQuote(state);
-        if (result.success) {
-          stateManager.nextStep();
-        } else {
-          alert(`Error: ${result.error || 'Failed to submit'}`);
+        try {
+          const result = await submitQuote(state);
+          if (result.success) stateManager.nextStep();
+          else alert(`Error: ${result.error || 'Failed to submit'}`);
+        } finally {
+          nextBtn.disabled = false;
         }
       } else {
         stateManager.nextStep();
+        nextBtn.disabled = false;
       }
     },
     'btn-primary'
@@ -662,4 +795,20 @@ function renderNavButtons(container: HTMLElement, stateManager: StateManager, is
   navContainer.appendChild(nextBtn);
 
   container.appendChild(navContainer);
+}
+
+/* ------------------------------ Helpers ------------------------------ */
+
+// POZOR: už nepoužíváme bindAutocompleteOnce – čistíme vše přes disposers + cleanupAll
+
+async function downscaleToDataUrl(file: File, maxSide = 1600, quality = 0.82): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  const { width, height } = bitmap;
+  const scale = Math.min(1, maxSide / Math.max(width, height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(width * scale);
+  canvas.height = Math.round(height * scale);
+  const ctx = canvas.getContext('2d')!;
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg', quality);
 }

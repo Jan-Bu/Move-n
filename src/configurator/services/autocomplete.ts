@@ -1,137 +1,253 @@
-import { czechCities } from '../data/cities';
+// src/configurator/services/autocomplete.ts
+// Mapy.cz Suggest integrováno s autoComplete.js (CDN).
+// Využívá dispozer pro čisté odpojení při re-renderech.
+//
+// Volání: const dispose = setupAutocomplete(input, (sel) => { ... }, { lang: 'cs' });
+// dispose() zavolej při opuštění kroku / re-renderu.
 
-export function setupAutocomplete(inputEl: HTMLInputElement): void {
-  const datalistId = `cities-${Math.random().toString(36).substr(2, 9)}`;
-  inputEl.setAttribute('list', datalistId);
+type Suggestion = {
+  label: string;
+  lat?: number;
+  lon?: number;
+  raw?: any;
+};
 
-  const datalist = document.createElement('datalist');
-  datalist.id = datalistId;
-
-  czechCities.forEach((city) => {
-    const option = document.createElement('option');
-    option.value = city;
-    datalist.appendChild(option);
-  });
-
-  inputEl.parentElement?.appendChild(datalist);
-
-  const config = getAutocompleteConfig();
-  if (config.type === 'google' && config.apiKey) {
-    enhanceWithGoogle(inputEl, config.apiKey);
-  } else if (config.type === 'photon') {
-    enhanceWithPhoton(inputEl);
-  }
-}
-
-interface AutocompleteConfig {
-  type: 'none' | 'google' | 'photon';
-  apiKey?: string;
-}
-
-function getAutocompleteConfig(): AutocompleteConfig {
-  const type = (import.meta.env?.VITE_ADDRESS_AUTOCOMPLETE || 'none') as 'none' | 'google' | 'photon';
-  const apiKey = import.meta.env?.VITE_GOOGLE_MAPS_API_KEY;
-  return { type, apiKey };
-}
-
-function enhanceWithGoogle(inputEl: HTMLInputElement, apiKey: string): void {
-  if (typeof google === 'undefined' || !google.maps) {
-    loadGoogleMaps(apiKey, () => {
-      initGoogleAutocomplete(inputEl);
-    });
-  } else {
-    initGoogleAutocomplete(inputEl);
-  }
-}
-
-function loadGoogleMaps(apiKey: string, callback: () => void): void {
-  if (document.querySelector('script[src*="maps.googleapis.com"]')) {
-    callback();
-    return;
-  }
-
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-  script.async = true;
-  script.defer = true;
-  script.onload = callback;
-  document.head.appendChild(script);
-}
-
-function initGoogleAutocomplete(inputEl: HTMLInputElement): void {
-  try {
-    const autocomplete = new google.maps.places.Autocomplete(inputEl, {
-      componentRestrictions: { country: 'cz' },
-      fields: ['formatted_address'],
-    });
-
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (place.formatted_address) {
-        inputEl.value = place.formatted_address;
-        inputEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    });
-  } catch (error) {
-    console.warn('Google Maps autocomplete failed to initialize:', error);
-  }
-}
-
-function enhanceWithPhoton(inputEl: HTMLInputElement): void {
-  let timeoutId: number;
-
-  inputEl.addEventListener('input', () => {
-    clearTimeout(timeoutId);
-    const query = inputEl.value.trim();
-
-    if (query.length < 3) return;
-
-    timeoutId = window.setTimeout(() => {
-      fetchPhotonSuggestions(query).then((suggestions) => {
-        updateDatalist(inputEl, suggestions);
-      });
-    }, 300);
-  });
-}
-
-async function fetchPhotonSuggestions(query: string): Promise<string[]> {
-  try {
-    const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=10&lang=cs&bbox=12.0,48.5,18.9,51.1`
-    );
-    const data = await response.json();
-
-    return data.features.map((feature: any) => {
-      const props = feature.properties;
-      return [props.name, props.city, props.country]
-        .filter(Boolean)
-        .join(', ');
-    });
-  } catch (error) {
-    console.warn('Photon autocomplete failed:', error);
-    return [];
-  }
-}
-
-function updateDatalist(inputEl: HTMLInputElement, suggestions: string[]): void {
-  const datalistId = inputEl.getAttribute('list');
-  if (!datalistId) return;
-
-  const datalist = document.getElementById(datalistId);
-  if (!datalist) return;
-
-  datalist.innerHTML = '';
-
-  [...czechCities, ...suggestions].forEach((value) => {
-    const option = document.createElement('option');
-    option.value = value;
-    datalist.appendChild(option);
-  });
-}
+type SetupOptions = {
+  lang?: 'cs' | 'en';
+  limit?: number;
+  minChars?: number;
+};
 
 declare global {
   interface Window {
-    google: any;
+    autoComplete?: any;
   }
-  const google: any;
 }
+
+const DEFAULTS = {
+  lang: 'cs',
+  limit: 5,
+  minChars: 3,
+};
+
+const MAPYCZ_SUGGEST = 'https://api.mapy.cz/v1/suggest';
+
+// 1) API klíč – vem z .env, když není, můžeš dočasně vložit svůj testovací:
+const ENV_KEY = (import.meta as any).env?.VITE_MAPYCZ_KEY as string | undefined;
+// Fallback – POZOR: nenechávej v produkci, raději použij .env
+const HARDCODED_DEV_KEY =
+  'eyJpIjoyNTcsImMiOjE2Njc0ODU2MjN9.c_UlvdpHGTI_Jb-TNMYlDYuIkCLJaUpi911RdlwPsAY';
+
+const API_KEY = ENV_KEY || HARDCODED_DEV_KEY;
+
+// 2) Lazy-load CSS + JS (autoComplete.js z CDN) – jen jednou
+let libLoaded: Promise<void> | null = null;
+function loadAutoCompleteLib(): Promise<void> {
+  if (libLoaded) return libLoaded;
+  libLoaded = new Promise<void>((resolve, reject) => {
+    // CSS
+    const cssHref =
+      'https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.02.min.css';
+    if (!document.querySelector(`link[data-autocomplete-css]`)) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = cssHref;
+      link.setAttribute('data-autocomplete-css', '1');
+      document.head.appendChild(link);
+    }
+
+    // JS
+    if (window.autoComplete) {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src =
+      'https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js';
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = (e) => reject(e);
+    document.head.appendChild(script);
+  });
+  return libLoaded;
+}
+
+// 3) Prostý cache podle dotazu
+const queryCache = new Map<string, Array<{ value: string; data: any }>>();
+
+async function fetchSuggest(query: string, lang: string, limit: number) {
+  const key = `${lang}|${limit}|${query}`;
+  if (queryCache.has(key)) return queryCache.get(key)!;
+
+  const url = new URL(MAPYCZ_SUGGEST);
+  url.searchParams.set('lang', lang);
+  url.searchParams.set('limit', String(limit));
+  // Chceš jen adresy (nejčistší výsledky pro náš případ):
+  url.searchParams.set('type', 'regional.address');
+  url.searchParams.set('apikey', API_KEY);
+  url.searchParams.set('query', query);
+
+  const res = await fetch(url.toString());
+  if (!res.ok) throw new Error('Suggest failed: ' + res.status);
+  const json = await res.json();
+
+  const items: Array<{ value: string; data: any }> = (json.items || []).map((item: any) => ({
+    value: item.name,
+    data: item,
+  }));
+  queryCache.set(key, items);
+  return items;
+}
+
+// 4) Veřejné API: setupAutocomplete
+export function setupAutocomplete(
+  input: HTMLInputElement,
+  onSelect?: (s: Suggestion) => void,
+  opts: SetupOptions = {}
+) {
+  const { lang, limit, minChars } = { ...DEFAULTS, ...opts };
+
+  // Přebal UI o wrapper (autoComplete.js to vyžaduje pro styling)
+  let wrapper: HTMLDivElement | null = null;
+  if (!input.parentElement?.classList.contains('autoComplete_wrapper')) {
+    wrapper = document.createElement('div');
+    wrapper.className = 'autoComplete_wrapper';
+    input.parentElement?.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+  }
+
+  let acInstance: any = null;
+  let selectionHandler: any = null;
+  let destroyed = false;
+
+  const init = async () => {
+    await loadAutoCompleteLib();
+    if (destroyed) return;
+
+    // @ts-ignore
+    acInstance = new window.autoComplete({
+      selector: () => input,
+      placeHolder: input.placeholder || (lang === 'cs' ? 'Zadejte adresu…' : 'Enter your address…'),
+      threshold: minChars, // kolik znaků před hledáním
+      searchEngine: (query: string, record: string) => `<mark>${record}</mark>`,
+      data: {
+        keys: ['value'],
+        src: async (q: string) => {
+          if (!q || q.trim().length < minChars) return [];
+          try {
+            const items = await fetchSuggest(q.trim(), lang, limit);
+            // autoComplete.js občas vrátí pozdější odpověď dřív — použij aktuální vstup (cache)
+            const now = input.value.trim();
+            if (now.length >= minChars) {
+              const cachedNow = await fetchSuggest(now, lang, limit);
+              return cachedNow;
+            }
+            return items;
+          } catch {
+            return [];
+          }
+        },
+        cache: false,
+      },
+      resultsList: {
+        element: (list: HTMLElement, data: any) => {
+          // Bez scrollu – Mapy.cz mají krátké návrhy
+          list.style.maxHeight = 'max-content';
+          list.style.overflow = 'hidden';
+
+          if (!data.results.length) {
+            const msg = document.createElement('div');
+            msg.className = 'no_result';
+            msg.style.padding = '5px';
+            msg.innerHTML = `<span>${lang === 'cs' ? 'Žádné výsledky pro' : 'Found no results for'
+              } "${data.query}"</span>`;
+            list.prepend(msg);
+          } else {
+            const logoHolder = document.createElement('div');
+            const text = document.createElement('span');
+            const img = new Image();
+
+            logoHolder.style.cssText =
+              'padding:5px;display:flex;align-items:center;justify-content:end;gap:5px;font-size:12px;';
+            text.textContent = 'Powered by';
+            img.src = 'https://api.mapy.cz/img/api/logo-small.svg';
+            img.style.width = '60px';
+            logoHolder.append(text, img);
+            list.append(logoHolder);
+          }
+        },
+        noResults: true,
+      },
+      resultItem: {
+        element: (itemEl: HTMLElement, data: any) => {
+          const itemData = data.value.data;
+          const desc = document.createElement('div');
+          desc.style.cssText = 'overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+          desc.innerHTML = `${itemData.label}, ${itemData.location}`;
+          itemEl.append(desc);
+        },
+        highlight: true,
+      },
+    });
+
+    async function geocodeLabel(label: string, lang: string) {
+      const url = new URL('https://api.mapy.cz/v1/geocode');
+      url.searchParams.set('query', label);
+      url.searchParams.set('limit', '1');
+      url.searchParams.set('lang', lang);
+      url.searchParams.set('apikey', API_KEY);
+      const res = await fetch(url.toString());
+      if (!res.ok) return null;
+      const json = await res.json();
+      const item = json?.items?.[0];
+      const lat = item?.position?.lat ?? item?.center?.lat;
+      const lon = item?.position?.lon ?? item?.center?.lon;
+      return (lat != null && lon != null) ? { lat, lon } : null;
+    }
+
+    selectionHandler = async (event: any) => {
+      const orig = event.detail?.selection?.value?.data;
+      if (!orig) return;
+
+      input.value = orig.name;
+
+      let lat = orig?.position?.lat ?? orig?.center?.lat ?? undefined;
+      let lon = orig?.position?.lon ?? orig?.center?.lon ?? undefined;
+
+      if (lat == null || lon == null) {
+        const p = await geocodeLabel(orig.name || orig.label, lang);
+        if (p) { lat = p.lat; lon = p.lon; }
+      }
+
+      onSelect?.({
+        label: orig.name || orig.label,
+        lat,
+        lon,
+        raw: orig,
+      });
+    };
+
+      if (selectionHandler) {
+        input.addEventListener('selection', selectionHandler);
+      }
+  
+      // ------- disposer -------
+      return () => {
+        destroyed = true;
+        try {
+          if (selectionHandler) input.removeEventListener('selection', selectionHandler as any);
+        } catch { }
+        try {
+          const list = document.querySelector('.autoComplete_result_list');
+          if (list && list.parentElement) list.parentElement.removeChild(list);
+        
+          if (wrapper && wrapper.parentElement) {
+            wrapper.parentElement.insertBefore(input, wrapper);
+            wrapper.remove();
+          }
+        } catch { }
+      };
+    }
+  
+    return init();
+  }

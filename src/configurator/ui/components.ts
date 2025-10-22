@@ -27,7 +27,7 @@ export function createInput(
   input.placeholder = placeholder;
   input.className = 'configurator-input';
   if (field) input.setAttribute('data-field', field);
-  input.addEventListener('input', (e) => onChange((e.target as HTMLInputElement).value));
+  input.addEventListener('change', (e) => onChange((e.target as HTMLInputElement).value));
   return input;
 }
 
