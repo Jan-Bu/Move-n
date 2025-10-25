@@ -1,5 +1,5 @@
 // src/configurator/ui/renderer.ts
-import { ConfiguratorState, STEPS, PhotoFile } from '../types';
+import { ConfiguratorState, STEPS, PhotoFile, ElevatorType } from '../types';
 import { StateManager } from '../state';
 import { t } from '../i18n';
 import { tExt } from '../i18n-extended';
@@ -32,13 +32,10 @@ function isVisibleStep(x: number): x is VisibleStep {
   return (VISIBLE_STEPS as readonly number[]).includes(x);
 }
 
-// ---------- Lifecycle cleanup (zabrání zdvojeným listenerům, „dvojkliku“ apod.) ----------
+// ---------- Lifecycle cleanup  ----------
 let disposers: Array<() => void> = [];
 
-/**
- * Přijme synchronní disposer (() => void) NEBO Promise<(() => void) | void>.
- * Tím pádem zvládneme i knihovny, které se načítají lazy/async (autoComplete.js).
- */
+
 function addDisposer(
   d: (() => void) | Promise<(() => void) | void> | undefined
 ) {
@@ -66,7 +63,7 @@ function cleanupAll() {
 
 function renderStepper(container: HTMLElement, state: ConfiguratorState) {
   const visualIndex = isVisibleStep(state.currentStep)
-    ? VISIBLE_STEPS.indexOf(state.currentStep as VisibleStep) + 1 // 1-based index pro správné zvýraznění „1“
+    ? VISIBLE_STEPS.indexOf(state.currentStep as VisibleStep) + 1
     : 1;
 
   const stepper = createStepper(visualIndex, VISIBLE_STEPS.length, state.lang);
@@ -74,7 +71,7 @@ function renderStepper(container: HTMLElement, state: ConfiguratorState) {
 }
 
 export function render(container: HTMLElement, stateManager: StateManager): void {
-  // vždy před novým renderem uklidíme staré listenery / autocomplete / atd.
+
   cleanupAll();
 
   const state = stateManager.getState();
@@ -113,7 +110,7 @@ export function render(container: HTMLElement, stateManager: StateManager): void
         break;
     }
 
-    // Enter = „Další“, ale ne v textarea
+
     wrapper.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !(e.target instanceof HTMLTextAreaElement)) {
         const next = wrapper.querySelector<HTMLButtonElement>('.configurator-nav .btn-primary');
@@ -187,22 +184,45 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   fromTitle.textContent = t(state.lang, 'address.from');
   fromSection.appendChild(fromTitle);
 
-  const fromAddressInput = createInput(
-    'text',
-    state.from.address,
-    (val) => stateManager.updateState({ from: { ...state.from, address: val } }),
-    t(state.lang, 'address.placeholder'),
-    'from.address'
-  );
+  const fromAddressInput = document.createElement('input');
+  fromAddressInput.type = 'text';
+  fromAddressInput.value = state.from.address;
+  fromAddressInput.placeholder = t(state.lang, 'address.placeholder');
+  fromAddressInput.className = 'configurator-input';
+  fromAddressInput.setAttribute('data-field', 'from.address');
   fromAddressInput.autocomplete = 'off';
 
-  // Mapy.cz autocomplete + uložíme disposer (sync i async varianta)
+  // Při opuštění pole uložíme hodnotu
+  fromAddressInput.addEventListener('blur', () => {
+    stateManager.setFromAddress({ address: fromAddressInput.value });
+  });
+  
+  // Při Enter také uložíme
+  fromAddressInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      stateManager.setFromAddress({ address: fromAddressInput.value });
+    }
+  });
+
+  // KLÍČOVÁ ZMĚNA: Callback pro zpracování výběru z našeptávače
   addDisposer(
     setupAutocomplete(
       fromAddressInput,
-      (sel) => {
-        // volitelné: uložit lat/lon
-        // stateManager.updateState({ from: { ...state.from, lat: sel.lat, lon: sel.lon } });
+      (suggestion) => {
+        console.log('🎯 FROM autocomplete callback received:', suggestion);
+        
+        // Uložíme přesnou adresu z našeptávače
+        stateManager.setFromAddress({ 
+          address: suggestion.label 
+        });
+        
+        console.log('💾 FROM address saved to state:', suggestion.label);
+        
+        // Pokud máme souřadnice, můžeme je využít pro výpočet vzdálenosti
+        if (suggestion.lat && suggestion.lon && state.to.address) {
+          // Zde můžete přidat logiku pro výpočet vzdálenosti
+          console.log('FROM coords:', suggestion.lat, suggestion.lon);
+        }
       },
       { lang: state.lang }
     )
@@ -212,13 +232,44 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
     createFormGroup(t(state.lang, 'address.label'), fromAddressInput, 'from.address')
   );
 
+  // FROM: výtah (checkbox) – po změně okamžitě překreslíme, aby se select ukázal/schoval
   fromSection.appendChild(
     createCheckbox(
       state.from.elevator,
-      (val) => stateManager.updateState({ from: { ...state.from, elevator: val } }),
+      (val) => {
+        stateManager.updateState({
+          from: {
+            ...state.from,
+            elevator: val,
+            // při vypnutí nulujeme typ, při zapnutí ponecháme dosud zvolený nebo null
+            elevatorType: val ? (state.from.elevatorType ?? null) : null,
+          },
+        });
+        // ukázat/schovat select bez čekání na další akci
+        render(container.parentElement as HTMLElement, stateManager);
+      },
       t(state.lang, 'address.elevator')
     )
   );
+
+  // FROM: pokud je výtah, zobraz výběr typu
+  if (state.from.elevator) {
+    const fromElevatorType = createSelect(
+      state.from.elevatorType ?? '',            // current value
+      [
+        { value: '', label: t(state.lang, 'address.elevatorType.placeholder') },
+        { value: 'small_personal', label: t(state.lang, 'address.elevatorType.small_personal') },
+        { value: 'large_personal', label: t(state.lang, 'address.elevatorType.large_personal') },
+        { value: 'freight', label: t(state.lang, 'address.elevatorType.freight') },
+      ],
+      (val: string) => {                         // onChange
+        stateManager.setFromAddress({ elevatorType: (val || null) as any });
+      }
+    );
+    fromSection.appendChild(
+      createFormGroup(t(state.lang, 'address.elevatorType.label'), fromElevatorType, 'from.elevatorType')
+    );
+  }
 
   const fromFloor = createInput(
     'number',
@@ -248,21 +299,45 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   toTitle.textContent = t(state.lang, 'address.to');
   toSection.appendChild(toTitle);
 
-  const toAddressInput = createInput(
-    'text',
-    state.to.address,
-    (val) => stateManager.updateState({ to: { ...state.to, address: val } }),
-    t(state.lang, 'address.placeholder'),
-    'to.address'
-  );
+  const toAddressInput = document.createElement('input');
+  toAddressInput.type = 'text';
+  toAddressInput.value = state.to.address;
+  toAddressInput.placeholder = t(state.lang, 'address.placeholder');
+  toAddressInput.className = 'configurator-input';
+  toAddressInput.setAttribute('data-field', 'to.address');
   toAddressInput.autocomplete = 'off';
 
+  // Při opuštění pole uložíme hodnotu
+  toAddressInput.addEventListener('blur', () => {
+    stateManager.setToAddress({ address: toAddressInput.value });
+  });
+  
+  // Při Enter také uložíme
+  toAddressInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      stateManager.setToAddress({ address: toAddressInput.value });
+    }
+  });
+
+  // KLÍČOVÁ ZMĚNA: Callback pro zpracování výběru z našeptávače
   addDisposer(
     setupAutocomplete(
       toAddressInput,
-      (sel) => {
-        // volitelné: uložit lat/lon
-        // stateManager.updateState({ to: { ...state.to, lat: sel.lat, lon: sel.lon } });
+      (suggestion) => {
+        console.log('🎯 TO autocomplete callback received:', suggestion);
+        
+        // Uložíme přesnou adresu z našeptávače
+        stateManager.setToAddress({ 
+          address: suggestion.label 
+        });
+        
+        console.log('💾 TO address saved to state:', suggestion.label);
+        
+        // Pokud máme souřadnice, můžeme je využít pro výpočet vzdálenosti
+        if (suggestion.lat && suggestion.lon && state.from.address) {
+          // Zde můžete přidat logiku pro výpočet vzdálenosti
+          console.log('TO coords:', suggestion.lat, suggestion.lon);
+        }
       },
       { lang: state.lang }
     )
@@ -270,13 +345,42 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
 
   toSection.appendChild(createFormGroup(t(state.lang, 'address.label'), toAddressInput, 'to.address'));
 
+  // TO: výtah (checkbox) – po změně také okamžitý re-render
   toSection.appendChild(
     createCheckbox(
       state.to.elevator,
-      (val) => stateManager.updateState({ to: { ...state.to, elevator: val } }),
+      (val) => {
+        stateManager.updateState({
+          to: {
+            ...state.to,
+            elevator: val,
+            elevatorType: val ? (state.to.elevatorType ?? null) : null,
+          },
+        });
+        render(container.parentElement as HTMLElement, stateManager);
+      },
       t(state.lang, 'address.elevator')
     )
   );
+
+  // TO: pokud je výtah, zobraz výběr typu
+  if (state.to.elevator) {
+    const toElevatorType = createSelect(
+      state.to.elevatorType ?? '',
+      [
+        { value: '', label: t(state.lang, 'address.elevatorType.placeholder') },
+        { value: 'small_personal', label: t(state.lang, 'address.elevatorType.small_personal') },
+        { value: 'large_personal', label: t(state.lang, 'address.elevatorType.large_personal') },
+        { value: 'freight', label: t(state.lang, 'address.elevatorType.freight') },
+      ],
+      (val: string) => {
+        stateManager.setToAddress({ elevatorType: (val || null) as any });
+      }
+    );
+    toSection.appendChild(
+      createFormGroup(t(state.lang, 'address.elevatorType.label'), toElevatorType, 'to.elevatorType')
+    );
+  }
 
   const toFloor = createInput(
     'number',
@@ -309,6 +413,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   renderNavButtons(container, stateManager);
 }
 
+
 function renderInventory(container: HTMLElement, stateManager: StateManager): void {
   const state = stateManager.getState();
 
@@ -327,6 +432,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
   rooms.forEach((room) => {
     const roomSection = document.createElement('div');
     roomSection.className = 'room-section room-accordion';
+    // Výchozí stav: všechny místnosti jsou SBALENÉ (bez 'expanded')
 
     const roomHeader = document.createElement('div');
     roomHeader.className = 'room-header';
@@ -345,6 +451,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
 
     const grid = document.createElement('div');
     grid.className = 'inventory-grid room-content';
+    grid.style.display = 'none'; // Výchozí stav: obsah je skrytý
 
     room.items.forEach((item) => {
       const stateItem = state.inventory.find((i) => i.key === item.key);
@@ -371,11 +478,30 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
 
     roomSection.appendChild(grid);
 
+    // Handler pro kliknutí - zavře ostatní místnosti a otevře/zavře aktuální
     roomHeader.addEventListener('click', () => {
-      container.querySelectorAll('.room-accordion.expanded').forEach((el) => {
-        if (el !== roomSection) el.classList.remove('expanded');
+      const isCurrentlyExpanded = roomSection.classList.contains('expanded');
+      
+      // Zavři všechny místnosti
+      container.querySelectorAll('.room-accordion').forEach((accordion) => {
+        accordion.classList.remove('expanded');
+        const content = accordion.querySelector('.room-content') as HTMLElement;
+        const arrowEl = accordion.querySelector('.room-arrow') as HTMLElement;
+        if (content) {
+          content.style.display = 'none';
+        }
+        if (arrowEl) {
+          arrowEl.style.transform = 'rotate(0deg)';
+        }
       });
-      roomSection.classList.toggle('expanded');
+      
+      // Pokud tato místnost NEBYLA rozbalená, rozbal ji
+      if (!isCurrentlyExpanded) {
+        roomSection.classList.add('expanded');
+        grid.style.display = 'grid';
+        arrow.style.transform = 'rotate(180deg)';
+      }
+      // Pokud už byla rozbalená, zůstane zavřená (všechny jsme zavřeli výše)
     });
 
     container.appendChild(roomSection);
@@ -592,6 +718,11 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
 function renderSummary(container: HTMLElement, stateManager: StateManager): void {
   const state = stateManager.getState();
 
+  const labelForElevatorType = (value?: string | null) => {
+    if (!value) return '';
+    return t(state.lang, `address.elevatorType.${value}` as any);
+  };
+
   renderStepper(container, state);
 
   const title = document.createElement('h3');
@@ -611,22 +742,40 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
   };
 
   // From
-  {
-    const p = document.createElement('p');
-    p.textContent = state.from.address;
-    const p2 = document.createElement('p');
-    p2.textContent = `${state.from.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator1')}, ${t(state.lang, 'floor')} ${state.from.floor}`;
-    const frag = document.createDocumentFragment(); frag.append(p, p2);
-    sec(t(state.lang, 'summary.from'), frag);
+  const p = document.createElement('p');
+  p.textContent = state.from.address;
+
+  const p2 = document.createElement('p');
+  p2.textContent = `${state.from.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator1')}, ${t(state.lang, 'floor')} ${state.from.floor}`;
+
+  // ↓↓↓ NOVÉ: pokud je výtah a je zvolen typ, zobraz ho
+  const frag = document.createDocumentFragment();
+  frag.append(p, p2);
+  if (state.from.elevator && state.from.elevatorType) {
+    const p3 = document.createElement('p');
+    p3.textContent = `${t(state.lang, 'address.elevator1')}: ${labelForElevatorType(state.from.elevatorType)}`;
+    frag.append(p3);
   }
+
+  sec(t(state.lang, 'summary.from'), frag);
 
   // To
   {
     const p = document.createElement('p');
     p.textContent = state.to.address;
+
     const p2 = document.createElement('p');
     p2.textContent = `${state.to.elevator ? t(state.lang, 'yes') : t(state.lang, 'no')} ${t(state.lang, 'address.elevator1')}, ${t(state.lang, 'floor')} ${state.to.floor}`;
-    const frag = document.createDocumentFragment(); frag.append(p, p2);
+
+    // ↓↓↓ NOVÉ: pokud je výtah a je zvolen typ, zobraz ho
+    const frag = document.createDocumentFragment();
+    frag.append(p, p2);
+    if (state.to.elevator && state.to.elevatorType) {
+      const p3 = document.createElement('p');
+      p3.textContent = `${t(state.lang, 'address.elevator1')}: ${labelForElevatorType(state.to.elevatorType)}`;
+      frag.append(p3);
+    }
+
     sec(t(state.lang, 'summary.to'), frag);
   }
 
@@ -789,8 +938,6 @@ function renderNavButtons(container: HTMLElement, stateManager: StateManager, is
 }
 
 /* ------------------------------ Helpers ------------------------------ */
-
-// POZOR: už nepoužíváme bindAutocompleteOnce – čistíme vše přes disposers + cleanupAll
 
 async function downscaleToDataUrl(file: File, maxSide = 1600, quality = 0.82): Promise<string> {
   const bitmap = await createImageBitmap(file);

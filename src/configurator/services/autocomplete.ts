@@ -7,6 +7,14 @@ type Suggestion = {
   lat?: number;
   lon?: number;
   raw?: any;
+
+  // NOVÉ: rozparsované části adresy
+  street?: string;
+  houseNumber?: string;
+  municipality?: string; // obec/město (preferujeme municipality, jinak city/town)
+  postcode?: string;
+  region?: string;
+  country?: string;
 };
 
 type SetupOptions = {
@@ -83,7 +91,6 @@ async function fetchSuggest(query: string, lang: string, limit: number) {
   const json = await res.json();
 
   const items: Array<{ value: string; data: any }> = (json.items || []).map((item: any) => ({
-    // value tu klidně necháme jen "name"; zobrazení a doplnění vyřešíme vlastní logikou
     value: item.name,
     data: item,
   }));
@@ -91,9 +98,105 @@ async function fetchSuggest(query: string, lang: string, limit: number) {
   return items;
 }
 
-// Pomocná funkce pro zformátování co nejúplnější adresy
+// Bezpečné vytažení částí adresy z položky Mapy.cz
+function extractAddressParts(item: any) {
+  console.log('🔎 extractAddressParts - FULL raw item:', JSON.stringify(item, null, 2));
+  
+  const a = item?.address ?? {};
+  
+  console.log('🔎 extractAddressParts - raw item:', item);
+  console.log('🔎 extractAddressParts - address object:', a);
+  
+  // Zkusíme všechny možné zdroje dat
+  const street: string | undefined = 
+    a.street || 
+    a.thoroughfare || 
+    item?.street || 
+    item?.streetName;
+    
+  const houseNumber: string | undefined =
+    a.houseNumber || 
+    a.house_num || 
+    a.house || 
+    item?.houseNumber ||
+    item?.orientationNumber ||
+    item?.registrationNumber;
+    
+  const municipality: string | undefined =
+    a.municipality || 
+    a.city || 
+    a.town || 
+    item?.municipality || 
+    item?.city ||
+    item?.location ||
+    item?.region;
+    
+  const postcode: string | undefined = 
+    a.postcode || 
+    a.zip || 
+    item?.postcode ||
+    item?.zipCode;
+    
+  const region: string | undefined = 
+    a.region || 
+    item?.region ||
+    item?.district;
+    
+  const country: string | undefined = 
+    a.country || 
+    item?.country ||
+    item?.countryName;
+
+  console.log('🔎 extractAddressParts - results:', { street, houseNumber, municipality, postcode, region, country });
+
+  return { street, houseNumber, municipality, postcode, region, country };
+}
+
+// NOVÁ FUNKCE: Složení přesné adresy tak, jak to má být
+function composeStructuredAddress({
+  street,
+  houseNumber,
+  municipality,
+  postcode,
+  country,
+}: {
+  street?: string;
+  houseNumber?: string;
+  municipality?: string;
+  postcode?: string;
+  country?: string;
+}) {
+  const parts: string[] = [];
+  
+  // 1. Ulice + číslo popisné/evidenční
+  if (street && houseNumber) {
+    parts.push(`${street} ${houseNumber}`);
+  } else if (street) {
+    parts.push(street);
+  } else if (houseNumber) {
+    parts.push(houseNumber);
+  }
+  
+  // 2. Město
+  if (municipality) {
+    parts.push(municipality);
+  }
+  
+  // 3. PSČ
+  if (postcode) {
+    parts.push(postcode);
+  }
+  
+  // 4. Stát
+  if (country) {
+    parts.push(country);
+  }
+  
+  return parts.join(', ');
+}
+
+// Původní pomocná (zachována jako fallback)
 function formatAddress(item: any): string {
-  // 1) ideálně z objektu address (pokud je)
   const a = item?.address;
   if (a) {
     const parts = [
@@ -104,18 +207,13 @@ function formatAddress(item: any): string {
     ]
       .filter(Boolean)
       .join(', ')
-      .replace(/\s+,/g, ','); // drobný úklid mezer
-
+      .replace(/\s+,/g, ',');
     if (parts) return parts;
   }
-
-  // 2) label + location (co vrací suggest často)
   const label = item?.label;
   const location = item?.location;
   if (label && location) return `${label}, ${location}`;
   if (label) return label;
-
-  // 3) fallback na name
   return item?.name || '';
 }
 
@@ -155,6 +253,9 @@ export function setupAutocomplete(
   let acInstance: any = null;
   let selectionHandler: any = null;
   let destroyed = false;
+  
+  // Flag pro rozlišení, zda uživatel vybral z našeptávače nebo jen píše
+  let isManualInput = true;
 
   const init = async () => {
     await loadAutoCompleteLib();
@@ -172,7 +273,6 @@ export function setupAutocomplete(
           if (!q || q.trim().length < minChars) return [];
           try {
             const items = await fetchSuggest(q.trim(), lang, limit);
-            // závod odpovědí: vrať data pro aktuální hodnotu inputu
             const now = input.value.trim();
             if (now.length >= minChars) {
               const cachedNow = await fetchSuggest(now, lang, limit);
@@ -219,7 +319,10 @@ export function setupAutocomplete(
           const itemData = data.value.data;
           const desc = document.createElement('div');
           desc.style.cssText = 'overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
-          const line = formatAddress(itemData);
+          
+          // Zobrazíme složenou adresu
+          const parts = extractAddressParts(itemData);
+          const line = composeStructuredAddress(parts) || formatAddress(itemData);
           desc.textContent = line || itemData?.label || itemData?.name || '';
           itemEl.append(desc);
         },
@@ -229,22 +332,54 @@ export function setupAutocomplete(
 
     // ---- výběr položky ----
     selectionHandler = async (event: any) => {
+      isManualInput = false; // uživatel vybral z našeptávače
+      
       const orig = event.detail?.selection?.value?.data;
+      console.log('🔍 Selection event - orig data:', orig);
+      
       if (!orig) return;
 
-      // 1) doplň co nejúplnější text adresy do inputu
-      const fullText = formatAddress(orig);
+      // Rozparsujeme části adresy
+      const parts = extractAddressParts(orig);
+      console.log('📦 Extracted parts:', parts);
+
+      // Sestavíme adresu ručně z dostupných zdrojů
+      // 1. Ulice + číslo z orig.name (např. "Kaštanová 489/34")
+      const streetPart = orig.name || '';
+      
+      // 2. Město z orig.location nebo parts
+      const cityPart = orig.location || parts.municipality || parts.region || '';
+      
+      // 3. PSČ - zkusíme najít v různých místech
+      const postcodePart = parts.postcode || '';
+      
+      // 4. Stát
+      const countryPart = parts.country || 'Česko';
+      
+      // Složíme dohromady
+      const addressComponents = [
+        streetPart,
+        cityPart,
+        postcodePart,
+        countryPart
+      ].filter(p => p && p.trim());
+      
+      const fullText = addressComponents.join(', ');
+      
+      console.log('✅ Final composed address:', fullText);
+      console.log('   - Street:', streetPart);
+      console.log('   - City:', cityPart);
+      console.log('   - Postcode:', postcodePart);
+      console.log('   - Country:', countryPart);
+      
+      // DŮLEŽITÉ: nastavíme hodnotu inputu BEZ vyvolání events
       input.value = fullText;
+      console.log('💾 Input value set to:', input.value);
 
-      // 2) ručně "propaguj" změnu do state (createInput naslouchá na 'input')
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      // pro jistotu ještě i change (kdyby sis na to někde spoléhal)
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-
-      // 3) dopočítej lat/lon (z orig nebo geocode fallback)
+      // souřadnice (z orig nebo geocode fallback)
       let lat = orig?.position?.lat ?? orig?.center?.lat ?? undefined;
       let lon = orig?.position?.lon ?? orig?.center?.lon ?? undefined;
-      if (lat == null || lon == null && fullText) {
+      if ((lat == null || lon == null) && fullText) {
         const p = await geocodeLabel(fullText, lang);
         if (p) {
           lat = p.lat;
@@ -252,28 +387,52 @@ export function setupAutocomplete(
         }
       }
 
-      // 4) zavři seznam návrhů (UX)
+      // zavři seznam návrhů
       try {
         acInstance?.close();
       } catch {}
 
-      onSelect?.({
+      const suggestionData = {
         label: fullText,
         lat,
         lon,
         raw: orig,
-      });
+        street: parts.street,
+        houseNumber: parts.houseNumber,
+        municipality: parts.municipality,
+        postcode: parts.postcode,
+        region: parts.region,
+        country: parts.country,
+      };
+      
+      console.log('📤 Calling onSelect with:', suggestionData);
+
+      // >>> TADY POŠLEME STRUKTUROVANÁ DATA <<<
+      onSelect?.(suggestionData);
+      
+      isManualInput = true; // reset flagu
     };
 
     if (selectionHandler) {
       input.addEventListener('selection', selectionHandler);
     }
+    
+    // Při ručním psaní (bez výběru z našeptávače) uložíme přesně to, co napsal uživatel
+    const blurHandler = () => {
+      if (isManualInput && input.value.trim()) {
+        // Uživatel napsal něco a nepoužil našeptávač - uložíme přesně to co napsal
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    };
+    
+    input.addEventListener('blur', blurHandler);
 
     // ------- disposer -------
     return () => {
       destroyed = true;
       try {
         if (selectionHandler) input.removeEventListener('selection', selectionHandler as any);
+        input.removeEventListener('blur', blurHandler);
       } catch {}
       try {
         const list = document.querySelector('.autoComplete_result_list');

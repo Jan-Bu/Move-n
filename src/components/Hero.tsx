@@ -15,7 +15,7 @@ export default function Hero({ cityName }: HeroProps) {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 animate-fade-in">
           {cityName ? `Profesionální Stěhování v ${cityName}` : 'Profesionální Stěhování'}
-          <span className="block text-[#56A4A0] mt-2">S MOVE-N</span>
+          <span className="block text-[#56A4A0] mt-2">S MOVI-N</span>
         </h1>
         <p className="text-xl sm:text-2xl  mb-12 max-w-3xl mx-auto animate-slide-up">
           {cityName

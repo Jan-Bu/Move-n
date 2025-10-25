@@ -7,7 +7,7 @@ import MovingAnimation from '../components/MovingAnimation';
 export default function EnglishMovingPage() {
   useEffect(() => {
     document.documentElement.lang = 'en';
-    document.title = 'Moving Services Across the Czech Republic and Europe | MOVE-N';
+    document.title = 'Moving Services Across the Czech Republic and Europe | MOVI-N';
 
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
@@ -67,7 +67,7 @@ export default function EnglishMovingPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
             Moving Services Across the Czech Republic and Beyond
-            <span className="block text-[#56A4A0] mt-2">With MOVE-N</span>
+            <span className="block text-[#56A4A0] mt-2">With MOVI-N</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-800 mb-8 max-w-4xl mx-auto animate-slide-up">
             We provide professional moving services not only throughout the Czech Republic but also to neighboring countries such as Germany, Austria, Slovakia, and other countries. Whether you're moving a flat, office, or an entire household, our experienced team will handle everything safely and efficiently.
@@ -181,8 +181,8 @@ export default function EnglishMovingPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Email</p>
-                  <a href="mailto:info@move-n.cz" className="text-lg font-semibold text-gray-900 hover:text-green-600">
-                    info@move-n.cz
+                  <a href="mailto:info@MOVI-N.cz" className="text-lg font-semibold text-gray-900 hover:text-green-600">
+                    info@MOVI-N.cz
                   </a>
                 </div>
               </div>
@@ -200,7 +200,7 @@ export default function EnglishMovingPage() {
               </div>
 
               <div className="bg-gradient-to-br from-green-800 to-green-600 p-8 rounded-xl text-white">
-                <h3 className="text-2xl font-bold mb-4">Why Choose MOVE-N?</h3>
+                <h3 className="text-2xl font-bold mb-4">Why Choose MOVI-N?</h3>
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <span className="mr-3">✓</span>

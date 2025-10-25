@@ -60,16 +60,25 @@ export function createSelect(
 ): HTMLSelectElement {
   const select = document.createElement('select');
   select.className = 'configurator-select';
-  select.value = value;
 
+  // nejdřív přidej options
   options.forEach((opt) => {
     const option = document.createElement('option');
     option.value = opt.value;
     option.textContent = opt.label;
+    // označ předvybranou možnost (funguje spolehlivě i když nastavíme value předem)
+    if (opt.value === value) option.selected = true;
     select.appendChild(option);
   });
 
-  select.addEventListener('change', (e) => onChange((e.target as HTMLSelectElement).value));
+  // teprve potom nastav value (pro případ, že selected výše neodpovídal)
+  select.value = value;
+
+  // onChange handler
+  const handler = (e: Event) => onChange((e.target as HTMLSelectElement).value);
+  select.addEventListener('change', handler);
+  // volitelné: realtime při šipkách/klávesnici
+  select.addEventListener('input', handler);
 
   return select;
 }

@@ -2,12 +2,15 @@ export type Lang = 'cs' | 'en';
 
 export type TimeWindow = 'morning' | 'afternoon' | 'evening';
 
+export type ElevatorType = 'small_personal' | 'large_personal' | 'freight';
+
 export interface EndpointAddress {
   address: string;
   elevator: boolean;
   floor: number;
   longWalk?: boolean;
   narrowStairs?: boolean;
+  elevatorType?: ElevatorType | null;
 }
 
 export interface InventoryItem {

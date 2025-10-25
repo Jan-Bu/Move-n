@@ -80,7 +80,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
             </div>
 
             <div className="bg-gradient-to-br from-green-800 to-green-600 p-8 rounded-xl text-white">
-              <h3 className="text-2xl font-bold mb-4">Proč si vybrat MOVE-N?</h3>
+              <h3 className="text-2xl font-bold mb-4">Proč si vybrat MOVI-N?</h3>
               <ul className="space-y-3">
                 <li className="flex items-start">
                   <span className="mr-3">✓</span>

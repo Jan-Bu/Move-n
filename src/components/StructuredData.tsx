@@ -35,7 +35,7 @@ export function getMovingCompanySchema(cityName: string, cityUrl: string) {
   return {
     '@context': 'https://schema.org',
     '@type': 'MovingCompany',
-    name: `MOVE-N - Stěhování ${cityName}`,
+    name: `MOVI-N - Stěhování ${cityName}`,
     url: cityUrl,
     telephone: '+420123456789',
     email: 'info@move-n.cz',

@@ -50,7 +50,7 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Truck className="h-8 w-8 text-green-300" />
-              <span className="text-2xl font-bold">MOVE-N</span>
+              <span className="text-2xl font-bold">MOVI-N</span>
             </div>
             <p className="text-green-100 leading-relaxed">
               {t.description}
@@ -134,7 +134,7 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
         <div className="border-t border-green-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-green-100 text-sm text-center md:text-left">
-              © {currentYear} MOVE-N. {t.rights}
+              © {currentYear} MOVI-N. {t.rights}
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-green-100 hover:text-white text-sm transition-colors">

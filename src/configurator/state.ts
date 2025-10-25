@@ -16,6 +16,7 @@ function getDefaultAddress(): EndpointAddress {
   return {
     address: '',
     elevator: false,
+    elevatorType: null,
     floor: 0,
     longWalk: false,
     narrowStairs: false,
@@ -110,6 +111,8 @@ export function loadState(lang: Lang, pageSlug: string): ConfiguratorState | nul
     return {
       ...createInitialState(lang, pageSlug),
       ...parsed,
+      from: { ...getDefaultAddress(), ...(parsed.from ?? {}) },
+      to: { ...getDefaultAddress(), ...(parsed.to ?? {}) },
       services: {
         ...getDefaultServices(),
         ...(parsed.services ?? {}),

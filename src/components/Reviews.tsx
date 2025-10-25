@@ -33,7 +33,7 @@ export default function Reviews() {
       name: 'Petr Svoboda',
       role: 'Firemní stěhování',
       rating: 5,
-      text: 'Spolupráce s MOVE-N byla na jedničku. Přestěhovali naši kancelář během víkendu, takže jsme v pondělí mohli normálně pracovat. Skvělá koordinace a profesionalita.',
+      text: 'Spolupráce s MOVI-N byla na jedničku. Přestěhovali naši kancelář během víkendu, takže jsme v pondělí mohli normálně pracovat. Skvělá koordinace a profesionalita.',
     },
     {
       name: 'Marie Dvořáková',
@@ -45,7 +45,7 @@ export default function Reviews() {
       name: 'Martin Černý',
       role: 'Express stěhování',
       rating: 5,
-      text: 'Potřeboval jsem rychlé stěhování a MOVE-N mi vyšel maximálně vstříc. I přes krátký termín bylo vše dokonale zorganizované. Profesionální přístup!',
+      text: 'Potřeboval jsem rychlé stěhování a MOVI-N mi vyšel maximálně vstříc. I přes krátký termín bylo vše dokonale zorganizované. Profesionální přístup!',
     },
     {
       name: 'Lucie Horáková',

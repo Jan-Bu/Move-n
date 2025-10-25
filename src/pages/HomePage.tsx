@@ -44,8 +44,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       <SEO
-        title="MOVE-N | Profesionální stěhovací služby v ČR"
-        description="MOVE-N nabízí komplexní stěhovací služby po celé České republice. Zkušený tým, moderní vozidla, pojištění nákladu a férové ceny. ✓ Kontaktujte nás pro nezávaznou nabídku."
+        title="MOVI-N | Profesionální stěhovací služby v ČR"
+        description="MOVI-N nabízí komplexní stěhovací služby po celé České republice. Zkušený tým, moderní vozidla, pojištění nákladu a férové ceny. ✓ Kontaktujte nás pro nezávaznou nabídku."
       />
       <Navbar />
       <Hero />
