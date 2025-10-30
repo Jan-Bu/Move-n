@@ -92,13 +92,13 @@ export default function CityPage() {
       <StructuredData type="MovingCompany" data={movingCompanySchema} />
       <StructuredData type="FAQPage" data={faqSchema} />
       <Navbar />
-      <Hero cityName={city.name} />
+      <Hero cityName={city.nameLocative} />
 
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose prose-lg max-w-none">
             <h1 className="text-4xl font-bold text-gray-900 mb-6">
-              Stěhování po celé {city.name}
+              Stěhování po celé {city.nameLocative}
             </h1>
             <p className="text-lg text-gray-700 leading-relaxed whitespace-pre-line">
               {city.longDescription}
@@ -113,7 +113,7 @@ export default function CityPage() {
       <div id="moving-configurator-root" data-lang="cs" data-slug={city.slug} className="my-20"></div>
 
       <Reviews />
-      <FAQ items={city.faq} cityName={city.name} />
+      <FAQ items={city.faq} cityName={city.nameLocative} />
       <Cities />
       <Contact cityName={city.name} />
       <Footer />

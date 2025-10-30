@@ -262,6 +262,5 @@ export const translations: Record<Lang, Dict> = {
 
 export function tExt(lang: Lang, key: string): string {
   const dict = translations[lang];
-  // CZ/EN fallback a nakonec samotný klíč
   return dict[key] ?? translations.en[key] ?? key;
 }

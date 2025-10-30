@@ -1,4 +1,3 @@
-// src/configurator/state.ts
 import {
   ConfiguratorState,
   Lang,
@@ -10,7 +9,7 @@ import {
   PhotoFile,
 } from './types';
 
-// ---------- Helpers & defaults ----------
+// Helpers & defaults
 
 function getDefaultAddress(): EndpointAddress {
   return {
@@ -82,11 +81,10 @@ function canUseStorage(): boolean {
 }
 
 function computeVolumeFromInventory(inventory: InventoryItem[]): number {
-  // Součet qty * volumePerUnit pro položky, které volumePerUnit mají
   return inventory.reduce((acc, it) => acc + (it.volumePerUnit ? it.volumePerUnit * it.qty : 0), 0);
 }
 
-// ---------- Persistence ----------
+// Persistence
 
 export function saveState(state: ConfiguratorState): void {
   if (!canUseStorage()) return;
@@ -94,7 +92,6 @@ export function saveState(state: ConfiguratorState): void {
     const key = getStorageKey(state.lang, state.pageSlug);
     localStorage.setItem(key, JSON.stringify(state));
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Failed to save configurator state:', error);
   }
 }
@@ -107,7 +104,6 @@ export function loadState(lang: Lang, pageSlug: string): ConfiguratorState | nul
     if (!saved) return null;
     const parsed = JSON.parse(saved) as ConfiguratorState;
 
-    // Ochrana proti starším uloženým verzím – doplň chybějící části
     return {
       ...createInitialState(lang, pageSlug),
       ...parsed,
@@ -123,7 +119,6 @@ export function loadState(lang: Lang, pageSlug: string): ConfiguratorState | nul
       },
     };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Failed to load configurator state:', error);
     return null;
   }
@@ -135,17 +130,16 @@ export function clearState(lang: Lang, pageSlug: string): void {
     const key = getStorageKey(lang, pageSlug);
     localStorage.removeItem(key);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Failed to clear configurator state:', error);
   }
 }
 
-// ---------- State Manager ----------
+// State Manager
 
 export class StateManager {
   private state: ConfiguratorState;
   private listeners: Array<(state: ConfiguratorState) => void> = [];
-  private saveTimer: number | null = null; // debounce ukládání
+  private saveTimer: number | null = null;
 
   constructor(lang: Lang, pageSlug: string) {
     const loaded = loadState(lang, pageSlug);
@@ -153,16 +147,12 @@ export class StateManager {
   }
 
   getState(): ConfiguratorState {
-    // Vrať kopii, ať si ji nikdo omylem nemutuje zvenčí
     return { ...this.state };
   }
-
-  // --------- Publikované API (beze změn + pár nových pohodlných setterů) ---------
 
   updateState(updates: Partial<ConfiguratorState>): void {
     const next = { ...this.state, ...updates };
 
-    // Pokud se změnil inventář, přepočti odhad objemu
     if (updates.inventory) {
       const volumeM3 = computeVolumeFromInventory(next.inventory);
       next.estimate = { volumeM3 };
@@ -248,7 +238,6 @@ export class StateManager {
     this.updateState({ distance });
   }
 
-  // ---- nové pohodlné settery (bezpečné, volitelné použít) ----
   setFromAddress(addr: Partial<EndpointAddress>): void {
     this.updateState({ from: { ...this.state.from, ...addr } });
   }
@@ -303,14 +292,11 @@ export class StateManager {
 
   subscribe(listener: (state: ConfiguratorState) => void): () => void {
     this.listeners.push(listener);
-    // ihned po přihlášení pošli aktuální stav (užitečné pro první render)
     listener(this.getState());
     return () => {
       this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
-
-  // ---------- interní ----------
 
   private notifyListeners(): void {
     const snapshot = this.getState();
@@ -324,6 +310,6 @@ export class StateManager {
     this.saveTimer = window.setTimeout(() => {
       saveState(this.state);
       this.saveTimer = null;
-    }, 150); // 150 ms je příjemný kompromis pro rychlé klikání
+    }, 150);
   }
 }

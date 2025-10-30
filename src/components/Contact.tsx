@@ -109,7 +109,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
               data-netlify="true"
               netlify-honeypot="bot-field"
               className="space-y-6"
-              onSubmit={(e) => {
+              onSubmit={() => {
                 if (window.gtag && cityName) {
                   window.gtag('event', 'form_submit', {
                     event_category: 'Contact',

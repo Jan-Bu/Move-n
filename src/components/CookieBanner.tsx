@@ -18,7 +18,6 @@ export default function CookieBanner() {
   useEffect(() => {
     const consent = localStorage.getItem('cookieConsent');
     if (!consent) {
-      // Malé zpoždění pro lepší UX
       setTimeout(() => setShowBanner(true), 1000);
     }
   }, []);
@@ -27,7 +26,6 @@ export default function CookieBanner() {
     localStorage.setItem('cookieConsent', JSON.stringify(preferences));
     setShowBanner(false);
 
-    // V reálné aplikaci by zde bylo volání pro nastavení Google Analytics, Facebook Pixel, atd.
     if (preferences.marketing) {
       console.log('Marketing cookies enabled');
     }

@@ -1,5 +1,4 @@
-// src/configurator/ui/renderer.ts
-import { ConfiguratorState, STEPS, PhotoFile, ElevatorType } from '../types';
+import { ConfiguratorState, STEPS, PhotoFile } from '../types';
 import { StateManager } from '../state';
 import { t } from '../i18n';
 import { tExt } from '../i18n-extended';
@@ -35,8 +34,8 @@ function isVisibleStep(x: number): x is VisibleStep {
 // ---------- Lifecycle cleanup  ----------
 let disposers: Array<() => void> = [];
 
-// Globální stav pro uchování rozbalených místností
-let expandedRoomsState = new Set<string>();
+// Global state for preserving expanded rooms
+const expandedRoomsState = new Set<string>();
 
 function addDisposer(
   d: (() => void) | Promise<(() => void) | void> | undefined
@@ -46,8 +45,7 @@ function addDisposer(
     disposers.push(d);
     return;
   }
-  // @ts-ignore – feature-detection na Promise
-  if (typeof d.then === 'function') {
+  if (d && typeof (d as Promise<unknown>).then === 'function') {
     (d as Promise<(() => void) | void>).then((fn) => {
       if (typeof fn === 'function') disposers.push(fn);
     });
@@ -58,7 +56,9 @@ function cleanupAll() {
   for (const d of disposers) {
     try {
       d();
-    } catch { }
+    } catch (err) {
+      console.error('Cleanup error:', err);
+    }
   }
   disposers = [];
 }
@@ -273,8 +273,10 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
         { value: 'large_personal', label: t(state.lang, 'address.elevatorType.large_personal') },
         { value: 'freight', label: t(state.lang, 'address.elevatorType.freight') },
       ],
-      (val: string) => {                         // onChange
-        stateManager.setFromAddress({ elevatorType: (val || null) as any });
+      (val: string) => {
+        stateManager.setFromAddress({
+          elevatorType: val ? (val as 'small_personal' | 'large_personal' | 'freight') : null
+        });
       }
     );
     fromSection.appendChild(
@@ -385,7 +387,9 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
         { value: 'freight', label: t(state.lang, 'address.elevatorType.freight') },
       ],
       (val: string) => {
-        stateManager.setToAddress({ elevatorType: (val || null) as any });
+        stateManager.setToAddress({
+          elevatorType: val ? (val as 'small_personal' | 'large_personal' | 'freight') : null
+        });
       }
     );
     toSection.appendChild(
@@ -739,9 +743,9 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
   timeInput.className = 'configurator-input';
   timeInput.setAttribute('data-field', 'preferredWindow');
   
-  // Uložit JEN při blur (ne při každé změně)
+  // Save only on blur (not on every change)
   timeInput.addEventListener('blur', () => {
-    stateManager.updateState({ preferredWindow: timeInput.value as any });
+    stateManager.updateState({ preferredWindow: timeInput.value });
   });
   
   container.appendChild(createFormGroup(t(state.lang, 'services.time'), timeInput, 'preferredWindow'));
@@ -754,7 +758,7 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
 
   const labelForElevatorType = (value?: string | null) => {
     if (!value) return '';
-    return t(state.lang, `address.elevatorType.${value}` as any);
+    return t(state.lang, `address.elevatorType.${value as 'small_personal' | 'large_personal' | 'freight'}`);
   };
 
   renderStepper(container, state);

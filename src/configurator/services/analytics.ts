@@ -2,7 +2,7 @@ import { Lang } from '../types';
 
 export function trackEvent(
   eventName: string,
-  params: Record<string, any> = {}
+  params: Record<string, unknown> = {}
 ): void {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, params);
@@ -66,7 +66,7 @@ declare global {
     gtag?: (
       command: string,
       eventName: string,
-      params?: Record<string, any>
+      params?: Record<string, unknown>
     ) => void;
   }
 }
