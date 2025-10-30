@@ -1,4 +1,5 @@
 import { Truck, Facebook, Instagram, Mail, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface FooterProps {
   lang?: 'cs' | 'en';
@@ -137,12 +138,12 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
               © {currentYear} MOVI-N. {t.rights}
             </p>
             <div className="flex space-x-6">
-              <a href="#" className="text-green-100 hover:text-white text-sm transition-colors">
+              <Link to="/gdpr" className="text-green-100 hover:text-white text-sm transition-colors">
                 {t.privacy}
-              </a>
-              <a href="#" className="text-green-100 hover:text-white text-sm transition-colors">
+              </Link>
+              <Link to="/obchodni-podminky" className="text-green-100 hover:text-white text-sm transition-colors">
                 {t.terms}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
