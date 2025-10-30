@@ -35,6 +35,8 @@ function isVisibleStep(x: number): x is VisibleStep {
 // ---------- Lifecycle cleanup  ----------
 let disposers: Array<() => void> = [];
 
+// Globální stav pro uchování rozbalených místností
+let expandedRoomsState = new Set<string>();
 
 function addDisposer(
   d: (() => void) | Promise<(() => void) | void> | undefined
@@ -71,6 +73,15 @@ function renderStepper(container: HTMLElement, state: ConfiguratorState) {
 }
 
 export function render(container: HTMLElement, stateManager: StateManager): void {
+
+  // PŘED vymazáním uložíme stav rozbalených místností
+  if (container.querySelector('.room-accordion')) {
+    expandedRoomsState.clear();
+    container.querySelectorAll('.room-accordion.expanded').forEach((el) => {
+      const roomKey = el.getAttribute('data-room-key');
+      if (roomKey) expandedRoomsState.add(roomKey);
+    });
+  }
 
   cleanupAll();
 
@@ -429,10 +440,16 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
   subtitle.className = 'configurator-subtitle';
   container.appendChild(subtitle);
 
+  // Zjistíme, které místnosti byly předtím rozbalené (z globálního stavu)
+  const expandedRooms = new Set(expandedRoomsState);
+
   rooms.forEach((room) => {
     const roomSection = document.createElement('div');
     roomSection.className = 'room-section room-accordion';
-    // Výchozí stav: všechny místnosti jsou SBALENÉ (bez 'expanded')
+    roomSection.setAttribute('data-room-key', room.key);
+    
+    // Obnovíme stav rozbalení
+    const wasExpanded = expandedRooms.has(room.key);
 
     const roomHeader = document.createElement('div');
     roomHeader.className = 'room-header';
@@ -444,6 +461,9 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
     const arrow = document.createElement('span');
     arrow.className = 'room-arrow';
     arrow.textContent = '▼';
+    if (wasExpanded) {
+      arrow.style.transform = 'rotate(180deg)';
+    }
 
     roomHeader.appendChild(roomTitle);
     roomHeader.appendChild(arrow);
@@ -451,7 +471,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
 
     const grid = document.createElement('div');
     grid.className = 'inventory-grid room-content';
-    grid.style.display = 'none'; // Výchozí stav: obsah je skrytý
+    grid.style.display = wasExpanded ? 'grid' : 'none';
 
     room.items.forEach((item) => {
       const stateItem = state.inventory.find((i) => i.key === item.key);
@@ -477,10 +497,17 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
     });
 
     roomSection.appendChild(grid);
+    
+    if (wasExpanded) {
+      roomSection.classList.add('expanded');
+    }
 
     // Handler pro kliknutí - zavře ostatní místnosti a otevře/zavře aktuální
     roomHeader.addEventListener('click', () => {
       const isCurrentlyExpanded = roomSection.classList.contains('expanded');
+      
+      // Aktualizujeme globální stav
+      expandedRoomsState.clear();
       
       // Zavři všechny místnosti
       container.querySelectorAll('.room-accordion').forEach((accordion) => {
@@ -500,6 +527,8 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
         roomSection.classList.add('expanded');
         grid.style.display = 'grid';
         arrow.style.transform = 'rotate(180deg)';
+        // Uložíme do globálního stavu
+        expandedRoomsState.add(room.key);
       }
       // Pokud už byla rozbalená, zůstane zavřená (všechny jsme zavřeli výše)
     });
@@ -688,29 +717,34 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
   container.appendChild(photoSection);
 
   // Date / Time
-  const dateInput = createInput(
-    'date',
-    state.preferredDate,
-    (val) => stateManager.updateState({ preferredDate: val }),
-    '',
-    'preferredDate'
-  );
+  const dateInput = document.createElement('input');
+  dateInput.type = 'date';
+  dateInput.value = state.preferredDate;
+  dateInput.className = 'configurator-input';
+  dateInput.setAttribute('data-field', 'preferredDate');
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   dateInput.min = today.toISOString().slice(0, 10);
+  
+  // Uložit JEN při blur (ne při každé změně)
+  dateInput.addEventListener('blur', () => {
+    stateManager.updateState({ preferredDate: dateInput.value });
+  });
+  
   container.appendChild(createFormGroup(t(state.lang, 'services.date'), dateInput, 'preferredDate'));
 
-  const timeSelect = createSelect(
-    state.preferredWindow,
-    [
-      { value: '', label: '-' },
-      { value: 'morning', label: t(state.lang, 'services.morning') },
-      { value: 'afternoon', label: t(state.lang, 'services.afternoon') },
-      { value: 'evening', label: t(state.lang, 'services.evening') },
-    ],
-    (val) => stateManager.updateState({ preferredWindow: val as any })
-  );
-  container.appendChild(createFormGroup(t(state.lang, 'services.time'), timeSelect, 'preferredWindow'));
+  const timeInput = document.createElement('input');
+  timeInput.type = 'time';
+  timeInput.value = state.preferredWindow;
+  timeInput.className = 'configurator-input';
+  timeInput.setAttribute('data-field', 'preferredWindow');
+  
+  // Uložit JEN při blur (ne při každé změně)
+  timeInput.addEventListener('blur', () => {
+    stateManager.updateState({ preferredWindow: timeInput.value as any });
+  });
+  
+  container.appendChild(createFormGroup(t(state.lang, 'services.time'), timeInput, 'preferredWindow'));
 
   renderNavButtons(container, stateManager);
 }

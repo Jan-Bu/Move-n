@@ -8,11 +8,14 @@ interface PhotoFile {
   type: string;
 }
 
+type ElevatorType = 'small_personal' | 'large_personal' | 'freight';
+
 interface QuoteRequest {
   lang: string;
   from: {
     address: string;
     elevator: boolean;
+    elevatorType?: ElevatorType | null;
     floor: number;
     longWalk?: boolean;
     narrowStairs?: boolean;
@@ -20,6 +23,7 @@ interface QuoteRequest {
   to: {
     address: string;
     elevator: boolean;
+    elevatorType?: ElevatorType | null;
     floor: number;
     longWalk?: boolean;
     narrowStairs?: boolean;
@@ -47,6 +51,19 @@ interface QuoteRequest {
   email: string;
   phone?: string;
   timestamp: string;
+}
+
+// Helper funkce pro překlad typu výtahu
+function getElevatorTypeLabel(type: ElevatorType | null | undefined, lang: string): string {
+  if (!type) return '';
+  
+  const labels: Record<ElevatorType, { cs: string; en: string }> = {
+    small_personal: { cs: 'Malý osobní', en: 'Small passenger' },
+    large_personal: { cs: 'Velký osobní', en: 'Large passenger' },
+    freight: { cs: 'Nákladní', en: 'Freight' }
+  };
+  
+  return labels[type]?.[lang as 'cs' | 'en'] || type;
 }
 
 export default async (req: Request, context: Context) => {
@@ -157,6 +174,13 @@ export default async (req: Request, context: Context) => {
         ? "Ne"
         : "No"
     }</p>
+            ${
+              quote.from.elevator && quote.from.elevatorType
+                ? `<p><strong>${
+                    quote.lang === "cs" ? "Typ výtahu" : "Elevator type"
+                  }:</strong> ${getElevatorTypeLabel(quote.from.elevatorType, quote.lang)}</p>`
+                : ""
+            }
             <p><strong>${quote.lang === "cs" ? "Patro" : "Floor"}:</strong> ${
       quote.from.floor
     }</p>
@@ -197,6 +221,13 @@ export default async (req: Request, context: Context) => {
         ? "Ne"
         : "No"
     }</p>
+            ${
+              quote.to.elevator && quote.to.elevatorType
+                ? `<p><strong>${
+                    quote.lang === "cs" ? "Typ výtahu" : "Elevator type"
+                  }:</strong> ${getElevatorTypeLabel(quote.to.elevatorType, quote.lang)}</p>`
+                : ""
+            }
             <p><strong>${quote.lang === "cs" ? "Patro" : "Floor"}:</strong> ${
       quote.to.floor
     }</p>

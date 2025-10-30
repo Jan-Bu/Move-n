@@ -1,6 +1,6 @@
 export type Lang = 'cs' | 'en';
 
-export type TimeWindow = 'morning' | 'afternoon' | 'evening';
+export type TimeWindow = string;
 
 export type ElevatorType = 'small_personal' | 'large_personal' | 'freight';
 
@@ -17,9 +17,6 @@ export interface InventoryItem {
   key: string;
   label: string;
   qty: number;
-  /**
-   * m³ per unit (optional, pokud je k dispozici pro odhad objemu)
-   */
   volumePerUnit?: number;
 }
 
@@ -41,7 +38,6 @@ export interface Services {
 }
 
 export interface Estimate {
-  /** Odhadovaný objem v m³ */
   volumeM3: number;
 }
 
@@ -71,7 +67,7 @@ export type StepId = (typeof STEPS)[StepKey];
 export interface ConfiguratorState {
   lang: Lang;
   pageSlug: string;
-  currentStep: number; // nebo StepId, pokud chceš přísnější typ
+  currentStep: number; 
   from: EndpointAddress;
   to: EndpointAddress;
   distance?: number;
@@ -81,7 +77,7 @@ export interface ConfiguratorState {
   services: Services;
   estimate: Estimate;
   preferredDate: string;
-  preferredWindow: TimeWindow | '';
+  preferredWindow: TimeWindow | ''; 
   email: string;
   phone: string;
   consent: boolean;
@@ -92,17 +88,13 @@ export interface ValidationError {
   message: string;
 }
 
-/**
- * Payload pro odeslání (odvozené z ConfiguratorState, aby nedocházelo k driftu).
- * - některá pole jsou volitelná proti stavu (preferredDate/Window, phone, other)
- * - přidán timestamp
- */
+
 export type Payload = Omit<
   ConfiguratorState,
   'currentStep' | 'preferredWindow' | 'preferredDate' | 'phone' | 'consent'
 > & {
   preferredDate?: string;
-  preferredWindow?: TimeWindow;
+  preferredWindow?: TimeWindow; // string ve formátu "HH:MM"
   phone?: string;
   other?: string;
   timestamp: string;
