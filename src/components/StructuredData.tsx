@@ -37,8 +37,8 @@ export function getMovingCompanySchema(cityName: string, cityUrl: string) {
     '@type': 'MovingCompany',
     name: `MOVI-N - Stěhování ${cityName}`,
     url: cityUrl,
-    telephone: '+420123456789',
-    email: 'info@move-n.cz',
+    telephone: '+420777535749',
+    email: 'khaled.rami1990@gmail.com',
     areaServed: {
       '@type': 'City',
       name: cityName,

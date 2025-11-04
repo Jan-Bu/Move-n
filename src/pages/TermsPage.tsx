@@ -62,11 +62,9 @@ export default function TermsPage() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.provider.title')}</h2>
                 <div className="text-gray-700 leading-relaxed space-y-1">
-                  <p className="font-semibold">{t('terms.provider.company')}</p>
-                  <p>{t('terms.provider.id')}</p>
-                  <p>{t('terms.provider.address')}</p>
-                  <p>E-mail: info@move-n.cz</p>
-                  <p>{t('contact.phone')}: +420 123 456 789</p>
+                  {t('terms.provider.company') && <p className="font-semibold">{t('terms.provider.company')}</p>}
+                  {t('terms.provider.id') && <p>{t('terms.provider.id')}</p>}
+                  {t('terms.provider.address') && <p>{t('terms.provider.address')}</p>}
                 </div>
               </div>
             </div>

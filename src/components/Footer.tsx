@@ -89,14 +89,14 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-green-300" />
-                <a href="tel:+420123456789" className="text-green-100 hover:text-white transition-colors">
-                  +420 123 456 789
+                <a href="tel:+420777535749" className="text-green-100 hover:text-white transition-colors">
+                  +420 777 535 749
                 </a>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-green-300" />
-                <a href="mailto:info@move-n.cz" className="text-green-100 hover:text-white transition-colors">
-                  info@move-n.cz
+                <a href="mailto:khaled.rami1990@gmail.com" className="text-green-100 hover:text-white transition-colors">
+                  khaled.rami1990@gmail.com
                 </a>
               </li>
             </ul>

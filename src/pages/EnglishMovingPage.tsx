@@ -169,8 +169,8 @@ export default function EnglishMovingPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Phone</p>
-                  <a href="tel:+420123456789" className="text-lg font-semibold text-gray-900 hover:text-green-600">
-                    +420 123 456 789
+                  <a href="tel:+420777535749" className="text-lg font-semibold text-gray-900 hover:text-green-600">
+                    +420 777 535 749
                   </a>
                 </div>
               </div>
@@ -181,8 +181,8 @@ export default function EnglishMovingPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Email</p>
-                  <a href="mailto:info@MOVI-N.cz" className="text-lg font-semibold text-gray-900 hover:text-green-600">
-                    info@MOVI-N.cz
+                  <a href="mailto:khaled.rami1990@gmail.com" className="text-lg font-semibold text-gray-900 hover:text-green-600">
+                    khaled.rami1990@gmail.com
                   </a>
                 </div>
               </div>

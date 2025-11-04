@@ -30,14 +30,14 @@ export default function Contact({ cityName }: ContactProps = {}) {
     {
       icon: Phone,
       title: 'Telefon',
-      value: '+420 123 456 789',
-      href: 'tel:+420123456789',
+      value: '+420 777 535 749',
+      href: 'tel:+420777535749',
     },
     {
       icon: Mail,
       title: 'Email',
-      value: 'info@move-n.cz',
-      href: 'mailto:info@move-n.cz',
+      value: 'khaled.rami1990@gmail.com',
+      href: 'mailto:khaled.rami1990@gmail.com',
     },
     {
       icon: MapPin,
