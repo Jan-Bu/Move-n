@@ -490,7 +490,7 @@ function renderInventory(container: HTMLElement, stateManager: StateManager): vo
 
       const counter = createCounter(
         qty,
-        () => stateManager.addInventoryItem(item.key, tExt(state.lang, `item.${item.key}`), 0),
+        () => stateManager.addInventoryItem(item.key, tExt(state.lang, `item.${item.key}`), item.volume),
         () => stateManager.removeInventoryItem(item.key),
         (newQty) => stateManager.setInventoryQty(item.key, newQty)
       );

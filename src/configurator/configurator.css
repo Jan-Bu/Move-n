@@ -43,7 +43,7 @@
   text-align: center;
   padding: 6rem 2rem;
   border-radius: 12px;
-  background: linear-gradient(to bottom right, #234542, #56a4a0);
+  background: linear-gradient(to bottom right, #47a5a8, #84cdcf);
 }
 
 .configurator-intro-card .configurator-title {
@@ -52,7 +52,7 @@
 }
 
 .configurator-intro-card .configurator-subtitle {
-  color: #d4efee;
+  color: #e0f5f5;
   font-size: 1.25rem;
 }
 
@@ -81,12 +81,12 @@
 }
 
 .btn-primary {
-  background-color: #234542;
+  background-color: #4FB7BB;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #1a3432;
+  background-color: #47a5a8;
 }
 
 .btn-secondary {
@@ -130,7 +130,7 @@
 }
 
 .stepper-step.completed::after {
-  background-color: #234542;
+  background-color: #4FB7BB;
 }
 
 .stepper-circle {
@@ -148,12 +148,12 @@
 }
 
 .stepper-step.active .stepper-circle {
-  background-color: #234542;
+  background-color: #4FB7BB;
   color: white;
 }
 
 .stepper-step.completed .stepper-circle {
-  background-color: #234542;
+  background-color: #4FB7BB;
   color: white;
 }
 
@@ -164,7 +164,7 @@
 }
 
 .stepper-step.active .stepper-label {
-  color: #234542;
+  color: #4FB7BB;
   font-weight: 600;
 }
 
@@ -209,8 +209,8 @@
 .configurator-textarea:focus,
 .configurator-select:focus {
   outline: none;
-  border-color: #234542;
-  box-shadow: 0 0 0 3px rgba(35, 69, 66, 0.1);
+  border-color: #4FB7BB;
+  box-shadow: 0 0 0 3px rgba(79, 183, 187, 0.1);
 }
 
 .configurator-input.error,
@@ -273,7 +273,7 @@
   width: 2rem;
   height: 2rem;
   border: none;
-  background-color: #234542;
+  background-color: #4FB7BB;
   color: white;
   border-radius: 4px;
   font-size: 1.25rem;
@@ -283,7 +283,7 @@
 }
 
 .counter-btn:hover {
-  background-color: #1a3432;
+  background-color: #47a5a8;
 }
 
 .counter-input {
@@ -300,8 +300,8 @@
 }
 
 .volume-display {
-  background-color: #d4efee;
-  color: #234542;
+  background-color: #e0f5f5;
+  color: #47a5a8;
   padding: 1.5rem;
   border-radius: 8px;
   margin-top: 1.5rem;
@@ -354,7 +354,7 @@
 .summary-section h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #234542;
+  color: #4FB7BB;
   margin-bottom: 0.5rem;
 }
 
@@ -403,8 +403,8 @@
 }
 
 .room-accordion.expanded {
-  border-color: #234542;
-  box-shadow: 0 2px 8px rgba(35, 69, 66, 0.1);
+  border-color: #4FB7BB;
+  box-shadow: 0 2px 8px rgba(79, 183, 187, 0.1);
 }
 
 .room-header {
@@ -422,13 +422,13 @@
 }
 
 .room-accordion.expanded .room-header {
-  background-color: #d4efee;
+  background-color: #e0f5f5;
 }
 
 .room-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #234542;
+  color: #47a5a8;
   margin: 0;
 }
 

@@ -269,7 +269,15 @@ export default async (req: Request, context: Context) => {
           <h3>${quote.lang === "cs" ? "Předměty" : "Items"}:</h3>
           <ul>
             ${quote.inventory
-              .map((item) => `<li>${item.label}: ${item.qty}x</li>`)
+              .map((item) => {
+                const perUnitVolume = item.volumePerUnit || 0;
+                const totalItemVolume = perUnitVolume * item.qty;
+                return `<li>${item.label}: ${item.qty}x ${
+                  perUnitVolume > 0
+                    ? `(${perUnitVolume.toFixed(2)} m³ ${quote.lang === "cs" ? "každý" : "each"} = <strong>${totalItemVolume.toFixed(2)} m³</strong>)`
+                    : ""
+                }</li>`;
+              })
               .join("")}
           </ul>
           ${

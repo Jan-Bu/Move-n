@@ -26,14 +26,14 @@ export default function Hero({ cityName }: HeroProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
           <a
             href="#moving-configurator-root"
-            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-[#56A4A0] rounded-lg hover:bg-[#4a8f8b] transition-all transform hover:scale-105 shadow-xl"
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-cta rounded-lg hover:bg-cta-hover transition-all transform hover:scale-105 shadow-xl"
           >
             Kalkulačka Ceny
             <ArrowRight className="ml-2 h-5 w-5" />
           </a>
           <a
             href="#sluzby"
-            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-gray-900 border-2 border-[#56A4A0] rounded-lg hover:bg-[#56A4A0] hover:text-white transition-all transform hover:scale-105"
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-gray-900 border-2 border-primary rounded-lg hover:bg-primary hover:text-white transition-all transform hover:scale-105"
           >
             Naše Služby
           </a>

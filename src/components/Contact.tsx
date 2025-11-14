@@ -201,7 +201,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
 
               <button
                 type="submit"
-                className="w-full bg-green-800 text-white py-4 px-6 rounded-lg font-semibold hover:bg-green-700 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
+                className="w-full bg-cta text-white py-4 px-6 rounded-lg font-semibold hover:bg-cta-hover transition-all transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
               >
                 <span>Odeslat poptávku</span>
                 <Send className="h-5 w-5" />
