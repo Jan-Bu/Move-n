@@ -137,6 +137,20 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             <p className="text-green-100 text-sm text-center md:text-left">
               © {currentYear} MOVI-N. {t.rights}
             </p>
+
+            <a
+              href="https://bitsbytes.cz/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:opacity-80"
+            >
+              <img
+                src="/MadeBy.webp"
+                alt="Made by BitBytes"
+                className="h-9 w-auto"
+              />
+            </a>
+
             <div className="flex space-x-6">
               <Link to="/gdpr" className="text-green-100 hover:text-white text-sm transition-colors">
                 {t.privacy}
