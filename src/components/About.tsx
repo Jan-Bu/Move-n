@@ -79,7 +79,7 @@ export default function About() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className={isVisible ? 'animate-slide-in-left' : 'opacity-0'}>
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 font-script">
             <span className="text-green-800">MOVI-N <br></br> Moving with heart</span>
             </h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">

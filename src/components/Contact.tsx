@@ -51,7 +51,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
     <section id="kontakt" ref={sectionRef} className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-script">
             Kontaktujte <span className="text-green-800">Nás</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -128,7 +128,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
               </p>
 
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '130%' }}>
                   Jméno a příjmení *
                 </label>
                 <input
@@ -141,7 +141,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '130%' }}>
                   Email *
                 </label>
                 <input
@@ -154,7 +154,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
               </div>
 
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '130%' }}>
                   Telefon *
                 </label>
                 <input
@@ -167,7 +167,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
               </div>
 
               <div>
-                <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '130%' }}>
                   Typ služby *
                 </label>
                 <select
@@ -186,7 +186,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2" style={{ fontSize: '130%' }}>
                   Zpráva *
                 </label>
                 <textarea

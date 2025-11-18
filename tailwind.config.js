@@ -33,6 +33,11 @@ export default {
           hover: '#a0508c',   // Tmavší pro hover
         },
       },
+      fontFamily: {
+        'script': ['Segoe Script', 'cursive'],
+        'heading': ['Tw Cen MT', 'system-ui', 'sans-serif'],
+        'sans': ['Tw Cen MT', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],

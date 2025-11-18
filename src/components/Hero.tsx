@@ -13,11 +13,13 @@ export default function Hero({ cityName }: HeroProps) {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="flex justify-center mb-8 animate-fade-in">
+          <img src="/logo.PNG" alt="MOVI-N" className="h-32 sm:h-40 lg:h-48 w-auto" />
+        </div>
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 animate-fade-in">
           {cityName ? `Profesionální Stěhování v ${cityName}` : 'Profesionální Stěhování'}
-          <span className="block text-[#56A4A0] mt-2">S MOVI-N</span>
         </h1>
-        <p className="text-xl sm:text-2xl  mb-12 max-w-3xl mx-auto animate-slide-up">
+        <p className="text-xl sm:text-2xl mb-12 max-w-3xl mx-auto animate-slide-up">
           {cityName
             ? `Rychlé, spolehlivé a bezpečné stěhovací služby v ${cityName} a okolí`
             : 'Rychlé, spolehlivé a bezpečné stěhovací služby pro váš domov nebo firmu'

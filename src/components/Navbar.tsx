@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Truck } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -31,19 +31,12 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <a href="/" className="flex items-center space-x-2 group">
-            <Truck
-              className={`h-8 w-8 transition-colors ${
-                isScrolled ? 'text-green-800' : 'text-green-600'
-              } group-hover:text-green-800`}
+          <a href="/" className="flex items-center group">
+            <img
+              src="/logo.PNG"
+              alt="MOVI-N Logo"
+              className="h-16 w-auto transition-opacity group-hover:opacity-80"
             />
-            <span
-              className={`text-2xl font-bold transition-colors ${
-                isScrolled ? 'text-green-800' : 'text-green-600'
-              } group-hover:text-green-800`}
-            >
-              MOVI-N Moving with heart
-            </span>
           </a>
 
           <div className="hidden md:flex items-center space-x-6">

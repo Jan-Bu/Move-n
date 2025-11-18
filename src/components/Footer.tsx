@@ -1,4 +1,4 @@
-import { Truck, Facebook, Instagram, Mail, Phone } from 'lucide-react';
+import { Facebook, Instagram, Mail, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface FooterProps {
@@ -45,15 +45,18 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
   const t = translations[lang];
 
   return (
-    <footer className="text-white" style={{ background: '#47a5a8' }}>
+    <footer className="text-gray-900 bg-gradient-to-b from-white to-green-50" style={{ fontSize: '110%' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Truck className="h-8 w-8 text-green-300" />
-              <span className="text-2xl font-bold">MOVI-N</span>
+              <img
+                src="/logo.PNG"
+                alt="MOVI-N Logo"
+                className="h-20 w-auto"
+              />
             </div>
-            <p className="text-green-100 leading-relaxed">
+            <p className="text-gray-700 leading-relaxed">
               {t.description}
             </p>
           </div>
@@ -62,22 +65,22 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             <h3 className="text-lg font-semibold mb-4">{t.quickLinks}</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#sluzby" className="text-green-100 hover:text-white transition-colors">
+                <a href="#sluzby" className="text-gray-700 hover:text-primary transition-colors">
                   {t.services}
                 </a>
               </li>
               <li>
-                <a href="#o-nas" className="text-green-100 hover:text-white transition-colors">
+                <a href="#o-nas" className="text-gray-700 hover:text-primary transition-colors">
                   {t.about}
                 </a>
               </li>
               <li>
-                <a href="#recenze" className="text-green-100 hover:text-white transition-colors">
+                <a href="#recenze" className="text-gray-700 hover:text-primary transition-colors">
                   {t.reviews}
                 </a>
               </li>
               <li>
-                <a href="#kontakt" className="text-green-100 hover:text-white transition-colors">
+                <a href="#kontakt" className="text-gray-700 hover:text-primary transition-colors">
                   {t.contact}
                 </a>
               </li>
@@ -88,14 +91,14 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             <h3 className="text-lg font-semibold mb-4">{t.contactTitle}</h3>
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-green-300" />
-                <a href="tel:+420777535749" className="text-green-100 hover:text-white transition-colors">
+                <Phone className="h-5 w-5 text-primary" />
+                <a href="tel:+420777535749" className="text-gray-700 hover:text-primary transition-colors">
                   +420 777 535 749
                 </a>
               </li>
               <li className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-green-300" />
-                <a href="mailto:khaled.rami1990@gmail.com" className="text-green-100 hover:text-white transition-colors">
+                <Mail className="h-5 w-5 text-primary" />
+                <a href="mailto:khaled.rami1990@gmail.com" className="text-gray-700 hover:text-primary transition-colors">
                   khaled.rami1990@gmail.com
                 </a>
               </li>
@@ -107,21 +110,21 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="w-10 h-10 bg-green-800 rounded-lg flex items-center justify-center hover:bg-green-700 transition-colors"
+                className="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-secondary transition-colors"
                 aria-label="Facebook"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 bg-green-800 rounded-lg flex items-center justify-center hover:bg-green-700 transition-colors"
+                className="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-secondary transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
             <div className="mt-6">
-              <p className="text-green-100 text-sm">
+              <p className="text-gray-700 text-sm">
                 <strong>{t.businessHours}</strong>
                 <br />
                 {t.monFri}
@@ -132,9 +135,9 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
           </div>
         </div>
 
-        <div className="border-t border-green-800 pt-8">
+        <div className="border-t border-gray-300 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-green-100 text-sm text-center md:text-left">
+            <p className="text-gray-600 text-sm text-center md:text-left">
               © {currentYear} MOVI-N. {t.rights}
             </p>
 
@@ -152,10 +155,10 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             </a>
 
             <div className="flex space-x-6">
-              <Link to="/gdpr" className="text-green-100 hover:text-white text-sm transition-colors">
+              <Link to="/gdpr" className="text-gray-600 hover:text-primary text-sm transition-colors">
                 {t.privacy}
               </Link>
-              <Link to="/obchodni-podminky" className="text-green-100 hover:text-white text-sm transition-colors">
+              <Link to="/obchodni-podminky" className="text-gray-600 hover:text-primary text-sm transition-colors">
                 {t.terms}
               </Link>
             </div>

@@ -65,16 +65,18 @@ export default function EnglishMovingPage() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 animate-fade-in">
+          <div className="flex justify-center mb-8 animate-fade-in">
+            <img src="/logo.PNG" alt="MOVI-N" className="h-32 sm:h-40 lg:h-48 w-auto" />
+          </div>
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 animate-fade-in">
             Moving Services Across the Czech Republic and Beyond
-            <span className="block text-[#4FB7BB] mt-2">With MOVI-N</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-800 mb-8 max-w-4xl mx-auto animate-slide-up">
+          <p className="text-xl sm:text-2xl mb-12 max-w-3xl mx-auto animate-slide-up">
             We provide professional moving services not only throughout the Czech Republic but also to neighboring countries such as Germany, Austria, Slovakia, and other countries. Whether you're moving a flat, office, or an entire household, our experienced team will handle everything safely and efficiently.
           </p>
           <a
             href="#contact"
-            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-[#B45E9F] rounded-lg hover:bg-[#a0508c] transition-all transform hover:scale-105 shadow-xl"
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-cta rounded-lg hover:bg-cta-hover transition-all transform hover:scale-105 shadow-xl"
           >
             Get a Free Quote
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -87,7 +89,7 @@ export default function EnglishMovingPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 font-script">
               Our Services
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -131,7 +133,7 @@ export default function EnglishMovingPage() {
 
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 font-script">
             Cross-Border Moving Services
           </h2>
           <div className="prose prose-lg max-w-none text-gray-700 space-y-4">
@@ -153,7 +155,7 @@ export default function EnglishMovingPage() {
       <section id="contact" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 font-script">
               Contact Us
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
