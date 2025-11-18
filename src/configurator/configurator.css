@@ -203,6 +203,10 @@
   border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  box-sizing: border-box;
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .configurator-input:focus,
@@ -527,10 +531,37 @@
 
   .configurator-stepper {
     padding: 0;
+    gap: 0.5rem;
+  }
+
+  .stepper-step {
+    gap: 0.25rem;
+  }
+
+  .stepper-step:not(:last-child)::after {
+    display: none;
+  }
+
+  .stepper-circle {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.875rem;
   }
 
   .stepper-label {
-    display: none;
+    display: block;
+    font-size: 0.75rem;
+    max-width: 70px;
+  }
+
+  .configurator-select {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .configurator-select option {
+    white-space: normal;
   }
 
   .inventory-grid {

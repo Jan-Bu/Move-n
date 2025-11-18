@@ -47,8 +47,8 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
   return (
     <footer className="text-gray-900 bg-gradient-to-b from-white to-green-50" style={{ fontSize: '110%' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 text-center md:text-left">
+          <div className="flex flex-col items-center md:items-start">
             <div className="flex items-center space-x-2 mb-4">
               <img
                 src="/logo.PNG"
@@ -61,7 +61,7 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             </p>
           </div>
 
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="text-lg font-semibold mb-4">{t.quickLinks}</h3>
             <ul className="space-y-2">
               <li>
@@ -87,7 +87,7 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             </ul>
           </div>
 
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="text-lg font-semibold mb-4">{t.contactTitle}</h3>
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
@@ -105,9 +105,9 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             </ul>
           </div>
 
-          <div>
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="text-lg font-semibold mb-4">{t.followUs}</h3>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 justify-center md:justify-start">
               <a
                 href="#"
                 className="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-secondary transition-colors"
@@ -136,8 +136,8 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
         </div>
 
         <div className="border-t border-gray-300 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-gray-600 text-sm text-center md:text-left">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
+            <p className="text-gray-600 text-sm">
               © {currentYear} MOVI-N. {t.rights}
             </p>
 
@@ -154,7 +154,7 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
               />
             </a>
 
-            <div className="flex space-x-6">
+            <div className="flex space-x-6 justify-center">
               <Link to="/gdpr" className="text-gray-600 hover:text-primary text-sm transition-colors">
                 {t.privacy}
               </Link>

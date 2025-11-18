@@ -65,13 +65,13 @@ export default function EnglishMovingPage() {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex justify-center mb-8 animate-fade-in">
-            <img src="/logo.PNG" alt="MOVI-N" className="h-32 sm:h-40 lg:h-48 w-auto" />
+          <div className="flex justify-center mb-4 sm:mb-8 animate-fade-in">
+            <img src="/logo.PNG" alt="MOVI-N" className="h-20 sm:h-40 lg:h-48 w-auto" />
           </div>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 animate-fade-in">
+          <h1 className="text-3xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-3 sm:mb-6 animate-fade-in">
             Moving Services Across the Czech Republic and Beyond
           </h1>
-          <p className="text-xl sm:text-2xl mb-12 max-w-3xl mx-auto animate-slide-up">
+          <p className="text-base sm:text-2xl mb-6 sm:mb-12 max-w-3xl mx-auto animate-slide-up">
             We provide professional moving services not only throughout the Czech Republic but also to neighboring countries such as Germany, Austria, Slovakia, and other countries. Whether you're moving a flat, office, or an entire household, our experienced team will handle everything safely and efficiently.
           </p>
           <a
