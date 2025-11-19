@@ -55,9 +55,9 @@ export default function HomePage() {
       <div id="moving-configurator-root" data-lang="cs" className="my-20"></div>
 
       <Reviews />
-      <Cities />
       <Contact />
       <Footer />
+      <Cities />
     </div>
   );
 }
