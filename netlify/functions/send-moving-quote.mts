@@ -162,6 +162,13 @@ export default async (req: Request, context: Context) => {
 
     const quote: QuoteRequest = await req.json();
 
+    // Debug logging
+    console.log('=== RECEIVED QUOTE IN NETLIFY FUNCTION ===');
+    console.log('From address:', JSON.stringify(quote.from, null, 2));
+    console.log('To address:', JSON.stringify(quote.to, null, 2));
+    console.log('Distance:', quote.distance);
+    console.log('Volume:', quote.estimate.volumeM3);
+
     const services = [];
     if (quote.services.disassembly)
       services.push(

@@ -11,6 +11,8 @@ export interface EndpointAddress {
   longWalk?: boolean;
   narrowStairs?: boolean;
   elevatorType?: ElevatorType | null;
+  lat?: number;
+  lon?: number;
 }
 
 export interface InventoryItem {

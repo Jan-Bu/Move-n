@@ -21,6 +21,14 @@ export async function submitQuote(state: ConfiguratorState): Promise<{ success: 
     timestamp: new Date().toISOString(),
   };
 
+  // Debug logging
+  console.log('=== SUBMITTING QUOTE ===');
+  console.log('From address:', payload.from);
+  console.log('To address:', payload.to);
+  console.log('Distance:', payload.distance);
+  console.log('Volume:', payload.estimate.volumeM3);
+  console.log('Full payload:', JSON.stringify(payload, null, 2));
+
   try {
     const apiUrl = '/.netlify/functions/send-moving-quote';
 

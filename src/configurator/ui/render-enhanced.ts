@@ -17,6 +17,7 @@ import { trackStepView } from '../services/analytics';
 import { submitQuote } from '../services/submit';
 import { rooms } from '../data/rooms';
 import { calculateMovingPrice } from '../services/priceCalculator';
+import { calculateDistance } from '../services/distance';
 
 const VISIBLE_STEPS = [
   STEPS.ADDRESSES,
@@ -222,18 +223,26 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
       fromAddressInput,
       (suggestion) => {
         console.log('🎯 FROM autocomplete callback received:', suggestion);
-        
-        // Uložíme přesnou adresu z našeptávače
-        stateManager.setFromAddress({ 
-          address: suggestion.label 
+
+        // Uložíme přesnou adresu z našeptávače včetně souřadnic
+        stateManager.setFromAddress({
+          address: suggestion.label,
+          lat: suggestion.lat,
+          lon: suggestion.lon,
         });
-        
+
         console.log('💾 FROM address saved to state:', suggestion.label);
-        
-        // Pokud máme souřadnice, můžeme je využít pro výpočet vzdálenosti
-        if (suggestion.lat && suggestion.lon && state.to.address) {
-          // Zde můžete přidat logiku pro výpočet vzdálenosti
-          console.log('FROM coords:', suggestion.lat, suggestion.lon);
+
+        // Pokud máme souřadnice pro obě adresy, vypočítáme vzdálenost
+        if (suggestion.lat && suggestion.lon && state.to.lat && state.to.lon) {
+          const distance = calculateDistance(
+            suggestion.lat,
+            suggestion.lon,
+            state.to.lat,
+            state.to.lon
+          );
+          console.log('📏 Calculated distance:', distance, 'km');
+          stateManager.setDistance(distance);
         }
       },
       { lang: state.lang }
@@ -349,18 +358,26 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
       toAddressInput,
       (suggestion) => {
         console.log('🎯 TO autocomplete callback received:', suggestion);
-        
-        // Uložíme přesnou adresu z našeptávače
-        stateManager.setToAddress({ 
-          address: suggestion.label 
+
+        // Uložíme přesnou adresu z našeptávače včetně souřadnic
+        stateManager.setToAddress({
+          address: suggestion.label,
+          lat: suggestion.lat,
+          lon: suggestion.lon,
         });
-        
+
         console.log('💾 TO address saved to state:', suggestion.label);
-        
-        // Pokud máme souřadnice, můžeme je využít pro výpočet vzdálenosti
-        if (suggestion.lat && suggestion.lon && state.from.address) {
-          // Zde můžete přidat logiku pro výpočet vzdálenosti
-          console.log('TO coords:', suggestion.lat, suggestion.lon);
+
+        // Pokud máme souřadnice pro obě adresy, vypočítáme vzdálenost
+        if (suggestion.lat && suggestion.lon && state.from.lat && state.from.lon) {
+          const distance = calculateDistance(
+            state.from.lat,
+            state.from.lon,
+            suggestion.lat,
+            suggestion.lon
+          );
+          console.log('📏 Calculated distance:', distance, 'km');
+          stateManager.setDistance(distance);
         }
       },
       { lang: state.lang }
