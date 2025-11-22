@@ -179,7 +179,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
                   <option value="">Vyberte službu</option>
                   <option value="domacnost">Stěhování domácností</option>
                   <option value="firma">Firemní stěhování</option>
-                  <option value="baleni">Balení a zabalení</option>
+                  <option value="baleni">Balení</option>
                   <option value="preprava">Přeprava nábytku</option>
                   <option value="express">Express služby</option>
                 </select>

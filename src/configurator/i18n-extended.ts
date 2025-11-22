@@ -17,6 +17,7 @@ export const translations: Record<Lang, Dict> = {
     'room.boxes': 'Krabice a balení',
 
     // Living Room Items
+    'item.sofa4seat': 'Pohovka 4místná',
     'item.sofa3seat': 'Pohovka 3místná',
     'item.sofa2seat': 'Pohovka 2místná',
     'item.armchair': 'Křeslo',
@@ -58,9 +59,7 @@ export const translations: Record<Lang, Dict> = {
     'item.kitchenCabinet': 'Kuchyňská skříňka',
 
     // Dining Room Items
-    'item.diningTable4': 'Jídelní stůl (4 osoby)',
-    'item.diningTable6': 'Jídelní stůl (6 osob)',
-    'item.diningTable8': 'Jídelní stůl (8 osob)',
+    'item.diningTable': 'Jídelní stůl',
     'item.diningChair': 'Jídelní židle',
     'item.bench': 'Lavice',
     'item.chinaHutch': 'Nádobní skříň',
@@ -77,6 +76,7 @@ export const translations: Record<Lang, Dict> = {
 
     // Bathroom Items
     'item.washingMachineBath': 'Pračka',
+    'item.dryerBath': 'Sušička',
     'item.shelf': 'Police',
     'item.laundryBasket': 'Koš na prádlo',
 
@@ -89,7 +89,6 @@ export const translations: Record<Lang, Dict> = {
     'item.kidsChair': 'Dětská židle',
     'item.highChair': 'Vysoká židle',
     'item.playpen': 'Ohrádka',
-    'item.rockingChair': 'Houpací křeslo',
 
     // Garage Items
     'item.bike': 'Kolo',
@@ -116,6 +115,7 @@ export const translations: Record<Lang, Dict> = {
     'item.boxMedium': 'Střední krabice',
     'item.boxLarge': 'Velká krabice',
     'item.wardrobeBox': 'Šatní krabice',
+    'item.bag': 'Pytel',
 
     // Photo upload
     'photo.title': 'Fotografie',
@@ -145,6 +145,7 @@ export const translations: Record<Lang, Dict> = {
     'room.boxes': 'Boxes & Packing',
 
     // Living Room Items
+    'item.sofa4seat': '4-Seater Sofa',
     'item.sofa3seat': '3-Seater Sofa',
     'item.sofa2seat': '2-Seater Sofa',
     'item.armchair': 'Armchair',
@@ -186,9 +187,7 @@ export const translations: Record<Lang, Dict> = {
     'item.kitchenCabinet': 'Kitchen Cabinet',
 
     // Dining Room Items
-    'item.diningTable4': 'Dining Table (4 seats)',
-    'item.diningTable6': 'Dining Table (6 seats)',
-    'item.diningTable8': 'Dining Table (8 seats)',
+    'item.diningTable': 'Dining Table',
     'item.diningChair': 'Dining Chair',
     'item.bench': 'Bench',
     'item.chinaHutch': 'China Hutch',
@@ -205,6 +204,7 @@ export const translations: Record<Lang, Dict> = {
 
     // Bathroom Items
     'item.washingMachineBath': 'Washing Machine',
+    'item.dryerBath': 'Dryer',
     'item.shelf': 'Shelf',
     'item.laundryBasket': 'Laundry Basket',
 
@@ -217,7 +217,6 @@ export const translations: Record<Lang, Dict> = {
     'item.kidsChair': 'Kids Chair',
     'item.highChair': 'High Chair',
     'item.playpen': 'Playpen',
-    'item.rockingChair': 'Rocking Chair',
 
     // Garage Items
     'item.bike': 'Bicycle',
@@ -244,6 +243,7 @@ export const translations: Record<Lang, Dict> = {
     'item.boxMedium': 'Medium Box',
     'item.boxLarge': 'Large Box',
     'item.wardrobeBox': 'Wardrobe Box',
+    'item.bag': 'Bag',
 
     // Photo upload
     'photo.title': 'Photos',

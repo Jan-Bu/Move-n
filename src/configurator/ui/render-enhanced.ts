@@ -16,6 +16,7 @@ import { setupAutocomplete } from '../services/autocomplete';
 import { trackStepView } from '../services/analytics';
 import { submitQuote } from '../services/submit';
 import { rooms } from '../data/rooms';
+import { calculateMovingPrice } from '../services/priceCalculator';
 
 const VISIBLE_STEPS = [
   STEPS.ADDRESSES,
@@ -269,19 +270,29 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
       state.from.elevatorType ?? '',            // current value
       [
         { value: '', label: t(state.lang, 'address.elevatorType.placeholder') },
-        { value: 'small_personal', label: t(state.lang, 'address.elevatorType.small_personal') },
-        { value: 'large_personal', label: t(state.lang, 'address.elevatorType.large_personal') },
-        { value: 'freight', label: t(state.lang, 'address.elevatorType.freight') },
+        { value: 'elevator_2', label: t(state.lang, 'address.elevatorType.elevator_2') },
+        { value: 'elevator_4', label: t(state.lang, 'address.elevatorType.elevator_4') },
+        { value: 'elevator_6', label: t(state.lang, 'address.elevatorType.elevator_6') },
+        { value: 'elevator_8', label: t(state.lang, 'address.elevatorType.elevator_8') },
+        { value: 'elevator_10_13', label: t(state.lang, 'address.elevatorType.elevator_10_13') },
+        { value: 'elevator_15plus', label: t(state.lang, 'address.elevatorType.elevator_15plus') },
       ],
       (val: string) => {
         stateManager.setFromAddress({
-          elevatorType: val ? (val as 'small_personal' | 'large_personal' | 'freight') : null
+          elevatorType: val ? (val as any) : null
         });
       }
     );
-    fromSection.appendChild(
-      createFormGroup(t(state.lang, 'address.elevatorType.label'), fromElevatorType, 'from.elevatorType')
-    );
+    const elevatorGroup = createFormGroup(t(state.lang, 'address.elevatorType.label'), fromElevatorType, 'from.elevatorType');
+    fromSection.appendChild(elevatorGroup);
+
+    // Přidej info text pod select
+    const elevatorInfo = document.createElement('p');
+    elevatorInfo.style.fontSize = '0.875rem';
+    elevatorInfo.style.color = '#6b7280';
+    elevatorInfo.style.marginTop = '0.5rem';
+    elevatorInfo.textContent = t(state.lang, 'address.elevatorType.info');
+    elevatorGroup.appendChild(elevatorInfo);
   }
 
   const fromFloor = createInput(
@@ -382,19 +393,29 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
       state.to.elevatorType ?? '',
       [
         { value: '', label: t(state.lang, 'address.elevatorType.placeholder') },
-        { value: 'small_personal', label: t(state.lang, 'address.elevatorType.small_personal') },
-        { value: 'large_personal', label: t(state.lang, 'address.elevatorType.large_personal') },
-        { value: 'freight', label: t(state.lang, 'address.elevatorType.freight') },
+        { value: 'elevator_2', label: t(state.lang, 'address.elevatorType.elevator_2') },
+        { value: 'elevator_4', label: t(state.lang, 'address.elevatorType.elevator_4') },
+        { value: 'elevator_6', label: t(state.lang, 'address.elevatorType.elevator_6') },
+        { value: 'elevator_8', label: t(state.lang, 'address.elevatorType.elevator_8') },
+        { value: 'elevator_10_13', label: t(state.lang, 'address.elevatorType.elevator_10_13') },
+        { value: 'elevator_15plus', label: t(state.lang, 'address.elevatorType.elevator_15plus') },
       ],
       (val: string) => {
         stateManager.setToAddress({
-          elevatorType: val ? (val as 'small_personal' | 'large_personal' | 'freight') : null
+          elevatorType: val ? (val as any) : null
         });
       }
     );
-    toSection.appendChild(
-      createFormGroup(t(state.lang, 'address.elevatorType.label'), toElevatorType, 'to.elevatorType')
-    );
+    const elevatorGroup = createFormGroup(t(state.lang, 'address.elevatorType.label'), toElevatorType, 'to.elevatorType');
+    toSection.appendChild(elevatorGroup);
+
+    // Přidej info text pod select
+    const elevatorInfo = document.createElement('p');
+    elevatorInfo.style.fontSize = '0.875rem';
+    elevatorInfo.style.color = '#6b7280';
+    elevatorInfo.style.marginTop = '0.5rem';
+    elevatorInfo.textContent = t(state.lang, 'address.elevatorType.info');
+    elevatorGroup.appendChild(elevatorInfo);
   }
 
   const toFloor = createInput(
@@ -624,7 +645,8 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
     createCheckbox(
       state.services.insurance,
       (val) => stateManager.updateState({ services: { ...state.services, insurance: val } }),
-      t(state.lang, 'services.insurance')
+      `${t(state.lang, 'services.insurance')} (+0 Kč)`,
+      true
     )
   );
 
@@ -758,7 +780,7 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
 
   const labelForElevatorType = (value?: string | null) => {
     if (!value) return '';
-    return t(state.lang, `address.elevatorType.${value as 'small_personal' | 'large_personal' | 'freight'}`);
+    return t(state.lang, `address.elevatorType.${value as any}`);
   };
 
   renderStepper(container, state);
@@ -857,6 +879,98 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
     const p = document.createElement('p');
     p.textContent = `${state.photos.length} ${state.lang === 'cs' ? 'fotografií' : 'photos'}`;
     sec(tExt(state.lang, 'photo.title'), p);
+  }
+
+  // Price calculation
+  if (state.distance && state.estimate.volumeM3 > 0) {
+    const priceResult = calculateMovingPrice({
+      volumeM3: state.estimate.volumeM3,
+      distanceKm: state.distance,
+      items: state.inventory.map(item => ({ key: item.key, qty: item.qty })),
+      floorFrom: state.from.floor,
+      floorTo: state.to.floor,
+      elevatorFrom: state.from.elevatorType ?? null,
+      elevatorTo: state.to.elevatorType ?? null,
+      hasElevatorFrom: state.from.elevator,
+      hasElevatorTo: state.to.elevator,
+    });
+
+    const priceDiv = document.createElement('div');
+    priceDiv.className = 'price-breakdown';
+
+    const priceTitle = document.createElement('h4');
+    priceTitle.textContent = t(state.lang, 'price.title');
+    priceTitle.style.marginBottom = '1rem';
+    priceTitle.style.fontSize = '1.25rem';
+    priceTitle.style.fontWeight = '600';
+    priceDiv.appendChild(priceTitle);
+
+    const detailsDiv = document.createElement('div');
+    detailsDiv.style.display = 'flex';
+    detailsDiv.style.flexDirection = 'column';
+    detailsDiv.style.gap = '0.75rem';
+
+    const priceRow = (label: string, value: string, bold = false) => {
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.alignItems = 'center';
+      if (bold) {
+        row.style.fontWeight = '600';
+        row.style.fontSize = '1.125rem';
+        row.style.paddingTop = '0.75rem';
+        row.style.borderTop = '2px solid #e5e7eb';
+        row.style.marginTop = '0.5rem';
+      }
+
+      const labelEl = document.createElement('span');
+      labelEl.textContent = label;
+      const valueEl = document.createElement('span');
+      valueEl.textContent = value;
+
+      row.appendChild(labelEl);
+      row.appendChild(valueEl);
+      return row;
+    };
+
+    detailsDiv.appendChild(priceRow(t(state.lang, 'price.trips'), `${priceResult.numberOfTrips}×`));
+    detailsDiv.appendChild(priceRow(
+      t(state.lang, 'price.loadTime'),
+      `${priceResult.loadTimeMinutes} ${t(state.lang, 'price.minutes')}`
+    ));
+    detailsDiv.appendChild(priceRow(
+      t(state.lang, 'price.unloadTime'),
+      `${priceResult.unloadTimeMinutes} ${t(state.lang, 'price.minutes')}`
+    ));
+    detailsDiv.appendChild(priceRow(
+      t(state.lang, 'price.totalTime'),
+      `${priceResult.totalHours} ${t(state.lang, 'price.hours')}`
+    ));
+    detailsDiv.appendChild(priceRow(t(state.lang, 'price.labor'), `${priceResult.laborPrice.toLocaleString()} Kč`));
+    detailsDiv.appendChild(priceRow(t(state.lang, 'price.transport'), `${priceResult.transportPrice.toLocaleString()} Kč`));
+
+    if (priceResult.stairSurcharge > 0) {
+      detailsDiv.appendChild(priceRow(
+        t(state.lang, 'price.stairSurcharge'),
+        `${priceResult.stairSurcharge.toLocaleString()} Kč`
+      ));
+    }
+
+    if (priceResult.heavyItemSurcharge > 0) {
+      detailsDiv.appendChild(priceRow(
+        t(state.lang, 'price.heavyItemSurcharge'),
+        `${priceResult.heavyItemSurcharge.toLocaleString()} Kč`
+      ));
+    }
+
+    detailsDiv.appendChild(priceRow(
+      t(state.lang, 'price.total'),
+      `${priceResult.finalPrice.toLocaleString()} Kč`,
+      true
+    ));
+
+    priceDiv.appendChild(detailsDiv);
+    sec(t(state.lang, 'price.title'), priceDiv);
   }
 
   container.appendChild(card);

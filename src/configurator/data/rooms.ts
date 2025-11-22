@@ -12,6 +12,7 @@ export const rooms: Room[] = [
   {
     key: 'livingRoom',
     items: [
+      { key: 'sofa4seat', volume: 3.0 },
       { key: 'sofa3seat', volume: 2.5 },
       { key: 'sofa2seat', volume: 1.8 },
       { key: 'armchair', volume: 1.2 },
@@ -62,9 +63,7 @@ export const rooms: Room[] = [
   {
     key: 'diningRoom',
     items: [
-      { key: 'diningTable4', volume: 1.5 },
-      { key: 'diningTable6', volume: 2.0 },
-      { key: 'diningTable8', volume: 2.5 },
+      { key: 'diningTable', volume: 2.0 },
       { key: 'diningChair', volume: 0.4 },
       { key: 'bench', volume: 0.8 },
       { key: 'chinaHutch', volume: 2.0 },
@@ -87,6 +86,7 @@ export const rooms: Room[] = [
     key: 'bathroom',
     items: [
       { key: 'washingMachineBath', volume: 1.0 },
+      { key: 'dryerBath', volume: 1.0 },
       { key: 'cabinet', volume: 0.6 },
       { key: 'shelf', volume: 0.3 },
       { key: 'mirror', volume: 0.1 },
@@ -104,7 +104,6 @@ export const rooms: Room[] = [
       { key: 'kidsChair', volume: 0.3 },
       { key: 'highChair', volume: 0.5 },
       { key: 'playpen', volume: 0.6 },
-      { key: 'rocking chair', volume: 0.8 },
     ],
   },
   {
@@ -140,6 +139,7 @@ export const rooms: Room[] = [
       { key: 'boxMedium', volume: 0.1 },
       { key: 'boxLarge', volume: 0.2 },
       { key: 'wardrobeBox', volume: 0.5 },
+      { key: 'bag', volume: 0.15 },
     ],
   },
 ];

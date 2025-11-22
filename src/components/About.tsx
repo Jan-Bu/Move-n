@@ -1,42 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { CheckCircle, Users, Award, TrendingUp } from 'lucide-react';
-
-function AnimatedNumber({ value, suffix = '', duration = 2000, trigger }: { value: number; suffix?: string; duration?: number; trigger: boolean }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!trigger) return;
-
-    let startTime: number | null = null;
-    let animationFrame: number;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-
-      const easeOutQuad = (t: number) => t * (2 - t);
-      const easedProgress = easeOutQuad(progress);
-
-      setCount(Math.floor(easedProgress * value));
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      } else {
-        setCount(value);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
-    };
-  }, [trigger, value, duration]);
-
-  return <>{count}{suffix}</>;
-}
+import { CheckCircle } from 'lucide-react';
 
 export default function About() {
   const [isVisible, setIsVisible] = useState(false);
@@ -58,12 +21,6 @@ export default function About() {
 
     return () => observer.disconnect();
   }, []);
-
-  const stats = [
-    { icon: Users, value: 2500, suffix: '+', label: 'Spokojených Zákazníků' },
-    { icon: Award, value: 15, suffix: '+', label: 'Let Zkušeností' },
-    { icon: TrendingUp, value: 98, suffix: '%', label: 'Úspěšnost' },
-  ];
 
   const features = [
     'Zkušený a profesionální tým',
@@ -112,24 +69,6 @@ export default function About() {
                 alt="Stěhovací tým"
                 className="rounded-xl shadow-2xl"
               />
-              <div className="absolute -bottom-8 -left-8 bg-green-800 text-white p-8 rounded-xl shadow-xl">
-                <p className="text-4xl font-bold mb-2">
-                  <AnimatedNumber value={2500} suffix="+" trigger={isVisible} />
-                </p>
-                <p className="text-green-100">Úspěšných Stěhování</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-6 mt-16">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <stat.icon className="h-10 w-10 text-green-800 mx-auto mb-3" />
-                  <p className="text-3xl font-bold text-gray-900 mb-1">
-                    <AnimatedNumber value={stat.value} suffix={stat.suffix} trigger={isVisible} />
-                  </p>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
-                </div>
-              ))}
             </div>
           </div>
         </div>

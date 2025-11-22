@@ -35,8 +35,8 @@ export default function Services() {
     },
     {
       icon: Package,
-      title: 'Balení a Zabalení',
-      description: 'Profesionální zabalení vašeho majetku s kvalitními obaly',
+      title: 'Balení',
+      description: 'Profesionální balení vašeho majetku s kvalitními obaly',
     },
     {
       icon: Truck,

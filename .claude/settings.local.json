@@ -5,7 +5,8 @@
       "Bash(npx tsc:*)",
       "Bash(git push:*)",
       "Bash(timeout:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

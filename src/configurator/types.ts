@@ -2,7 +2,7 @@ export type Lang = 'cs' | 'en';
 
 export type TimeWindow = string;
 
-export type ElevatorType = 'small_personal' | 'large_personal' | 'freight';
+export type ElevatorType = 'elevator_2' | 'elevator_4' | 'elevator_6' | 'elevator_8' | 'elevator_10_13' | 'elevator_15plus';
 
 export interface EndpointAddress {
   address: string;

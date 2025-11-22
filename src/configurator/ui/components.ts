@@ -34,15 +34,24 @@ export function createInput(
 export function createCheckbox(
   checked: boolean,
   onChange: (checked: boolean) => void,
-  label: string
+  label: string,
+  disabled: boolean = false
 ): HTMLLabelElement {
   const labelEl = document.createElement('label');
   labelEl.className = 'configurator-checkbox';
+  if (disabled) {
+    labelEl.classList.add('disabled');
+    labelEl.style.opacity = '0.6';
+    labelEl.style.cursor = 'not-allowed';
+  }
 
   const input = document.createElement('input');
   input.type = 'checkbox';
   input.checked = checked;
-  input.addEventListener('change', (e) => onChange((e.target as HTMLInputElement).checked));
+  input.disabled = disabled;
+  if (!disabled) {
+    input.addEventListener('change', (e) => onChange((e.target as HTMLInputElement).checked));
+  }
 
   const span = document.createElement('span');
   span.textContent = label;
