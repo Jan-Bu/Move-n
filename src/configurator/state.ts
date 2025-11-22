@@ -39,7 +39,7 @@ function getDefaultServices(): Services {
     assembly: false,
     packingService: false,
     materials: getDefaultMaterials(),
-    insurance: false,
+    insurance: true,
   };
 }
 
