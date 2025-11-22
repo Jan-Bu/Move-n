@@ -221,7 +221,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   addDisposer(
     setupAutocomplete(
       fromAddressInput,
-      (suggestion) => {
+      async (suggestion) => {
         console.log('🎯 FROM autocomplete callback received:', suggestion);
 
         // Uložíme přesnou adresu z našeptávače včetně souřadnic
@@ -235,7 +235,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
 
         // Pokud máme souřadnice pro obě adresy, vypočítáme vzdálenost
         if (suggestion.lat && suggestion.lon && state.to.lat && state.to.lon) {
-          const distance = calculateDistance(
+          const distance = await calculateDistance(
             suggestion.lat,
             suggestion.lon,
             state.to.lat,
@@ -356,7 +356,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
   addDisposer(
     setupAutocomplete(
       toAddressInput,
-      (suggestion) => {
+      async (suggestion) => {
         console.log('🎯 TO autocomplete callback received:', suggestion);
 
         // Uložíme přesnou adresu z našeptávače včetně souřadnic
@@ -370,7 +370,7 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
 
         // Pokud máme souřadnice pro obě adresy, vypočítáme vzdálenost
         if (suggestion.lat && suggestion.lon && state.from.lat && state.from.lon) {
-          const distance = calculateDistance(
+          const distance = await calculateDistance(
             state.from.lat,
             state.from.lon,
             suggestion.lat,
