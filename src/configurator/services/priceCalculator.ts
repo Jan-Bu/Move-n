@@ -18,18 +18,16 @@ const FLOOR_COEFFICIENTS = {
 };
 
 // Elevator capacity mapping
-type ElevatorCapacity = 'none' | '2-person' | '4-person' | '6-person' | '8-person' | '10-13-person' | '15+-person';
+type ElevatorCapacity = 'none' | '1-3-person' | '4-6-person' | '7-9-person' | '10plus-person';
 
 function mapElevatorType(elevatorType: ElevatorType | null | undefined, hasElevator: boolean): ElevatorCapacity {
   if (!hasElevator || !elevatorType) return 'none';
 
   switch (elevatorType) {
-    case 'elevator_2': return '2-person';
-    case 'elevator_4': return '4-person';
-    case 'elevator_6': return '6-person';
-    case 'elevator_8': return '8-person';
-    case 'elevator_10_13': return '10-13-person';
-    case 'elevator_15plus': return '15+-person';
+    case 'elevator_1_3': return '1-3-person';
+    case 'elevator_4_6': return '4-6-person';
+    case 'elevator_7_9': return '7-9-person';
+    case 'elevator_10plus': return '10plus-person';
     default: return 'none';
   }
 }
@@ -49,32 +47,22 @@ function itemFitsInElevator(itemKey: string, elevatorSize: ElevatorCapacity): bo
 
   const veryLargeItems = [...largeItems, 'sofa3seat', 'bookcase', 'bedSingle', 'mattressSingle', 'serverTable', 'workbench', 'outdoorStorage'];
 
-  // 2-person elevator
-  if (elevatorSize === '2-person') {
+  // 1-3 person elevator
+  if (elevatorSize === '1-3-person') {
     return verySmallItems.includes(itemKey);
   }
 
-  // 4-person elevator
-  if (elevatorSize === '4-person') {
-    return smallItems.includes(itemKey);
-  }
-
-  // 6-person elevator
-  if (elevatorSize === '6-person') {
+  // 4-6 person elevator
+  if (elevatorSize === '4-6-person') {
     return mediumItems.includes(itemKey);
   }
 
-  // 8-person elevator
-  if (elevatorSize === '8-person') {
-    return largeItems.includes(itemKey);
-  }
-
-  // 10-13-person elevator
-  if (elevatorSize === '10-13-person') {
+  // 7-9 person elevator
+  if (elevatorSize === '7-9-person') {
     return veryLargeItems.includes(itemKey);
   }
 
-  // 15+-person elevator - fits everything
+  // 10+ person elevator - fits everything
   return true;
 }
 

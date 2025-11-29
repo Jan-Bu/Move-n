@@ -279,12 +279,10 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
       state.from.elevatorType ?? '',            // current value
       [
         { value: '', label: t(state.lang, 'address.elevatorType.placeholder') },
-        { value: 'elevator_2', label: t(state.lang, 'address.elevatorType.elevator_2') },
-        { value: 'elevator_4', label: t(state.lang, 'address.elevatorType.elevator_4') },
-        { value: 'elevator_6', label: t(state.lang, 'address.elevatorType.elevator_6') },
-        { value: 'elevator_8', label: t(state.lang, 'address.elevatorType.elevator_8') },
-        { value: 'elevator_10_13', label: t(state.lang, 'address.elevatorType.elevator_10_13') },
-        { value: 'elevator_15plus', label: t(state.lang, 'address.elevatorType.elevator_15plus') },
+        { value: 'elevator_1_3', label: t(state.lang, 'address.elevatorType.elevator_1_3') },
+        { value: 'elevator_4_6', label: t(state.lang, 'address.elevatorType.elevator_4_6') },
+        { value: 'elevator_7_9', label: t(state.lang, 'address.elevatorType.elevator_7_9') },
+        { value: 'elevator_10plus', label: t(state.lang, 'address.elevatorType.elevator_10plus') },
       ],
       (val: string) => {
         stateManager.setFromAddress({
@@ -410,12 +408,10 @@ function renderAddresses(container: HTMLElement, stateManager: StateManager): vo
       state.to.elevatorType ?? '',
       [
         { value: '', label: t(state.lang, 'address.elevatorType.placeholder') },
-        { value: 'elevator_2', label: t(state.lang, 'address.elevatorType.elevator_2') },
-        { value: 'elevator_4', label: t(state.lang, 'address.elevatorType.elevator_4') },
-        { value: 'elevator_6', label: t(state.lang, 'address.elevatorType.elevator_6') },
-        { value: 'elevator_8', label: t(state.lang, 'address.elevatorType.elevator_8') },
-        { value: 'elevator_10_13', label: t(state.lang, 'address.elevatorType.elevator_10_13') },
-        { value: 'elevator_15plus', label: t(state.lang, 'address.elevatorType.elevator_15plus') },
+        { value: 'elevator_1_3', label: t(state.lang, 'address.elevatorType.elevator_1_3') },
+        { value: 'elevator_4_6', label: t(state.lang, 'address.elevatorType.elevator_4_6') },
+        { value: 'elevator_7_9', label: t(state.lang, 'address.elevatorType.elevator_7_9') },
+        { value: 'elevator_10plus', label: t(state.lang, 'address.elevatorType.elevator_10plus') },
       ],
       (val: string) => {
         stateManager.setToAddress({

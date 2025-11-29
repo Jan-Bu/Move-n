@@ -8,7 +8,7 @@ interface PhotoFile {
   type: string;
 }
 
-type ElevatorType = 'elevator_2' | 'elevator_4' | 'elevator_6' | 'elevator_8' | 'elevator_10_13' | 'elevator_15plus';
+type ElevatorType = 'elevator_1_3' | 'elevator_4_6' | 'elevator_7_9' | 'elevator_10plus';
 
 interface QuoteRequest {
   lang: string;
@@ -72,15 +72,70 @@ function getElevatorTypeLabel(type: ElevatorType | null | undefined, lang: strin
   if (!type) return '';
 
   const labels: Record<ElevatorType, { cs: string; en: string }> = {
-    elevator_2: { cs: 'Výtah pro 2 osoby', en: 'Elevator for 2 people' },
-    elevator_4: { cs: 'Výtah pro 4 osoby', en: 'Elevator for 4 people' },
-    elevator_6: { cs: 'Výtah pro 6 osob', en: 'Elevator for 6 people' },
-    elevator_8: { cs: 'Výtah pro 8 osob', en: 'Elevator for 8 people' },
-    elevator_10_13: { cs: 'Výtah pro 10–13 osob', en: 'Elevator for 10–13 people' },
-    elevator_15plus: { cs: 'Výtah pro 15+ osob', en: 'Elevator for 15+ people' }
+    elevator_1_3: { cs: 'Výtah pro 1–3 osoby', en: 'Elevator for 1–3 people' },
+    elevator_4_6: { cs: 'Výtah pro 4–6 osob', en: 'Elevator for 4–6 people' },
+    elevator_7_9: { cs: 'Výtah pro 7–9 osob', en: 'Elevator for 7–9 people' },
+    elevator_10plus: { cs: 'Výtah pro 10+ osob', en: 'Elevator for 10+ people' }
   };
 
   return labels[type]?.[lang as 'cs' | 'en'] || type;
+}
+
+// Odhad váhy předmětu (stejná logika jako v priceCalculator.ts)
+function estimateItemWeight(itemKey: string): number {
+  const weights: Record<string, number> = {
+    // Heavy items (120+ kg)
+    sofa4seat: 150,
+    sofa3seat: 120,
+    wardrobe4door: 150,
+    wardrobe3door: 120,
+    chinaHutch: 130,
+
+    // Medium-heavy (80-120 kg)
+    sofa2seat: 90,
+    bedDouble: 100,
+    mattressDouble: 80,
+    wardrobe2door: 100,
+    fridge: 90,
+    fridgeFreezer: 100,
+    washingMachine: 80,
+    washingMachineBath: 80,
+    dryer: 80,
+    dryerBath: 80,
+    bookcase: 90,
+    diningTable: 85,
+
+    // Light-medium (50-80 kg)
+    armchair: 60,
+    bedSingle: 70,
+    mattressSingle: 50,
+    dresser: 65,
+    sideboard: 70,
+    tvStand: 55,
+    kitchenTable: 60,
+    freezer: 75,
+    dishwasher: 70,
+    desk: 65,
+    filingCabinet: 60,
+    bookshelf: 70,
+    babyCrib: 50,
+    toddlerBed: 55,
+    changingTable: 50,
+    workbench: 75,
+    shelving: 60,
+    garageCabinet: 65,
+    gardenFurnitureSet: 80,
+  };
+
+  return weights[itemKey] || 0; // 0 = lehký předmět
+}
+
+// Získání příplatku za těžký předmět
+function getHeavyItemSurcharge(weight: number, quantity: number): number {
+  if (weight >= 120) return 1500 * quantity;
+  if (weight >= 80) return 900 * quantity;
+  if (weight >= 50) return 400 * quantity;
+  return 0;
 }
 
 // Price calculation function (simplified version)
@@ -106,10 +161,17 @@ function calculatePrice(quote: QuoteRequest) {
   const hasStairs = (quote.from.floor > 0 && !quote.from.elevator) || (quote.to.floor > 0 && !quote.to.elevator);
   const stairSurcharge = hasStairs ? STAIR_SURCHARGE_PER_FLOOR * Math.ceil(avgFloor) : 0;
 
+  // Calculate heavy item surcharge
+  let heavyItemSurcharge = 0;
+  quote.inventory.forEach(({ key, qty }) => {
+    const weight = estimateItemWeight(key);
+    heavyItemSurcharge += getHeavyItemSurcharge(weight, qty);
+  });
+
   // Calculate prices
   const laborPrice = Math.ceil(totalHours * DEFAULT_HOURLY_RATE * DEFAULT_WORKERS);
   const transportPrice = Math.ceil(quote.distance * PRICE_PER_KM);
-  const finalPrice = laborPrice + transportPrice + stairSurcharge;
+  const finalPrice = laborPrice + transportPrice + stairSurcharge + heavyItemSurcharge;
 
   return {
     numberOfTrips,
@@ -119,6 +181,7 @@ function calculatePrice(quote: QuoteRequest) {
     laborPrice,
     transportPrice,
     stairSurcharge,
+    heavyItemSurcharge,
     finalPrice,
   };
 }
@@ -408,6 +471,7 @@ export default async (req: Request, context: Context) => {
             <p><strong>${quote.lang === "cs" ? "Práce" : "Labor"}:</strong> ${priceCalc.laborPrice.toLocaleString()} Kč</p>
             <p><strong>${quote.lang === "cs" ? "Doprava" : "Transport"}:</strong> ${priceCalc.transportPrice.toLocaleString()} Kč</p>
             ${priceCalc.stairSurcharge > 0 ? `<p><strong>${quote.lang === "cs" ? "Příplatek za schody" : "Stair surcharge"}:</strong> ${priceCalc.stairSurcharge.toLocaleString()} Kč</p>` : ''}
+            ${priceCalc.heavyItemSurcharge > 0 ? `<p><strong>${quote.lang === "cs" ? "Příplatek za těžké předměty" : "Heavy item surcharge"}:</strong> ${priceCalc.heavyItemSurcharge.toLocaleString()} Kč</p>` : ''}
             <p style="font-size: 18px; margin-top: 10px; padding-top: 10px; border-top: 2px solid #166534;"><strong>${quote.lang === "cs" ? "Celková cena" : "Total price"}:</strong> <span style="color: #166534; font-size: 22px;">${priceCalc.finalPrice.toLocaleString()} Kč</span></p>
           </div>
         </div>
@@ -489,6 +553,7 @@ export default async (req: Request, context: Context) => {
             <p><strong>${quote.lang === "cs" ? "Práce" : "Labor"}:</strong> ${priceCalc.laborPrice.toLocaleString()} Kč</p>
             <p><strong>${quote.lang === "cs" ? "Doprava" : "Transport"}:</strong> ${priceCalc.transportPrice.toLocaleString()} Kč</p>
             ${priceCalc.stairSurcharge > 0 ? `<p><strong>${quote.lang === "cs" ? "Příplatek za schody" : "Stair surcharge"}:</strong> ${priceCalc.stairSurcharge.toLocaleString()} Kč</p>` : ''}
+            ${priceCalc.heavyItemSurcharge > 0 ? `<p><strong>${quote.lang === "cs" ? "Příplatek za těžké předměty" : "Heavy item surcharge"}:</strong> ${priceCalc.heavyItemSurcharge.toLocaleString()} Kč</p>` : ''}
             <p style="font-size: 18px; margin-top: 10px; padding-top: 10px; border-top: 2px solid #166534;"><strong>${quote.lang === "cs" ? "Celková orientační cena" : "Total estimated price"}:</strong> <span style="color: #166534; font-size: 22px;">${priceCalc.finalPrice.toLocaleString()} Kč</span></p>
           </div>
           <p style="margin-top: 15px; font-size: 14px; color: #6b7280;">${
