@@ -231,6 +231,12 @@ export default async (req: Request, context: Context) => {
     console.log('To address:', JSON.stringify(quote.to, null, 2));
     console.log('Distance:', quote.distance);
     console.log('Volume:', quote.estimate.volumeM3);
+    console.log('Inventory:', JSON.stringify(quote.inventory, null, 2));
+
+    // Calculate price ONCE for both emails
+    const priceCalc = calculatePrice(quote);
+    console.log('=== PRICE CALCULATION ===');
+    console.log('Price result:', priceCalc);
 
     const services = [];
     if (quote.services.disassembly)
@@ -455,7 +461,6 @@ export default async (req: Request, context: Context) => {
 
         ${
           (() => {
-            const priceCalc = calculatePrice(quote);
             if (!priceCalc) return '';
 
             return `
@@ -527,7 +532,6 @@ export default async (req: Request, context: Context) => {
     };
 
     // Email pro klienta (confirmation)
-    const priceCalc = calculatePrice(quote);
     const clientEmailBody = `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
         <h1 style="color: #166534;">${
