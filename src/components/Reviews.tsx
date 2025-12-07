@@ -24,19 +24,19 @@ export default function Reviews() {
 
   const reviews = [
     {
-      name: 'Jana Nováková',
+      name: 'Jan Bubeníček',
       role: 'Stěhování bytu 3+1',
       rating: 5,
       text: 'Vynikající služby! Tým byl profesionální, rychlý a velmi ohleduplný k našemu nábytku. Stěhování proběhlo bez jediného problému. Mohu jen doporučit!',
     },
     {
-      name: 'Petr Svoboda',
+      name: 'Petr Uhlíř',
       role: 'Firemní stěhování',
       rating: 5,
       text: 'Spolupráce s MOVI-N byla na jedničku. Přestěhovali naši kancelář během víkendu, takže jsme v pondělí mohli normálně pracovat. Skvělá koordinace a profesionalita.',
     },
     {
-      name: 'Marie Dvořáková',
+      name: 'Zuzana Dvořáková',
       role: 'Stěhování rodinného domu',
       rating: 5,
       text: 'Děkujeme za perfektní servis! Ocenili jsme hlavně individuální přístup a flexibilitu. Vše proběhlo přesně podle plánu a cena odpovídala nabídce.',
@@ -66,7 +66,7 @@ export default function Reviews() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-script">
-            Co říkají <span className="text-green-800">Naši Zákazníci</span>
+            Co říkají <span className="text-green-800">naši zákazníci</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Přečtěte si zkušenosti našich spokojených klientů

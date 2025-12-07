@@ -17,7 +17,7 @@ export default function Hero({ cityName }: HeroProps) {
           <img src="/logo.PNG" alt="MOVI-N" className="h-20 sm:h-40 lg:h-48 w-auto" />
         </div>
         <h1 className="text-3xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-3 sm:mb-6 animate-fade-in">
-          {cityName ? `Profesionální Stěhování v ${cityName}` : 'Profesionální Stěhování'}
+          {cityName ? `Profesionální stěhování v ${cityName}` : 'Profesionální stěhování'}
         </h1>
         <p className="text-base sm:text-2xl mb-6 sm:mb-12 max-w-3xl mx-auto animate-slide-up">
           {cityName
@@ -30,14 +30,14 @@ export default function Hero({ cityName }: HeroProps) {
             href="#moving-configurator-root"
             className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-cta rounded-lg hover:bg-cta-hover transition-all transform hover:scale-105 shadow-xl"
           >
-            Kalkulačka Ceny
+            Kalkulačka ceny
             <ArrowRight className="ml-2 h-5 w-5" />
           </a>
           <a
             href="#sluzby"
             className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-gray-900 border-2 border-primary rounded-lg hover:bg-primary hover:text-white transition-all transform hover:scale-105"
           >
-            Naše Služby
+            Naše služby
           </a>
         </div>
       </div>

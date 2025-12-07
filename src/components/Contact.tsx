@@ -42,7 +42,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
     {
       icon: MapPin,
       title: 'Adresa',
-      value: 'Praha, Česká republika',
+      value: 'Hradec Králové, Česká republika',
       href: '#',
     },
   ];
@@ -52,7 +52,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-script">
-            Kontaktujte <span className="text-green-800">Nás</span>
+            Kontaktujte <span className="text-green-800">nás</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Máte zájem o naše služby? Vyplňte formulář a my se vám ozveme do 24 hodin

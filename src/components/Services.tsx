@@ -25,12 +25,12 @@ export default function Services() {
   const services = [
     {
       icon: Home,
-      title: 'Stěhování Domácností',
+      title: 'Stěhování domácností',
       description: 'Kompletní stěhování bytů a rodinných domů s profesionálním přístupem',
     },
     {
       icon: Building2,
-      title: 'Firemní Stěhování',
+      title: 'Firemní stěhování',
       description: 'Efektivní přemístění kanceláří a firemních prostor s minimálními prostoji',
     },
     {
@@ -40,7 +40,7 @@ export default function Services() {
     },
     {
       icon: Truck,
-      title: 'Demontáž a Montáž Nábytku',
+      title: 'Demontáž a montáž Nábytku',
       description: 'Odborná demontáž, přeprava a opětovná montáž vašeho nábytku',
     },
     {
@@ -50,7 +50,7 @@ export default function Services() {
     },
     {
       icon: Clock,
-      title: 'Express Služby',
+      title: 'Express služby',
       description: 'Rychlé stěhování v nouzových situacích a krátkých termínech',
     },
   ];
@@ -60,7 +60,7 @@ export default function Services() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 ${isVisible ? 'animate-slide-up' : 'opacity-0'}`}>
           <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 font-script">
-            Naše <span className="text-green-800">Služby</span>
+            Naše <span className="text-green-800">služby</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Poskytujeme komplexní stěhovací služby přizpůsobené vašim potřebám včetně stěhování do zahraničí.
