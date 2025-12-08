@@ -109,14 +109,18 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
             <h3 className="text-lg font-semibold mb-4">{t.followUs}</h3>
             <div className="flex space-x-4 justify-center md:justify-start">
               <a
-                href="#"
+                href="https://www.facebook.com/share/1BqNhj1ajn/?mibextid=wwXIfr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-secondary transition-colors"
                 aria-label="Facebook"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/movi_n.cz?igsh=MjloajU2MHA4dmY4&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-secondary transition-colors"
                 aria-label="Instagram"
               >

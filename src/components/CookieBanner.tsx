@@ -66,9 +66,9 @@ export default function CookieBanner() {
       />
 
       {/* Cookie Banner */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6 animate-slide-up">
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-2 sm:p-4 md:p-6 animate-slide-up">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-green-600 relative">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border-2 sm:border-4 border-green-600 relative">
             {/* Decorative moving boxes animation */}
             <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
               <div className="moving-box-animation">
@@ -89,42 +89,42 @@ export default function CookieBanner() {
 
             {!showCustomize ? (
               /* Main Banner */
-              <div className="p-6 md:p-8">
-                <div className="flex items-start space-x-4 mb-6">
-                  <div className="flex-shrink-0 bg-green-100 rounded-full p-3">
-                    <Package className="w-8 h-8 text-green-600" />
+              <div className="p-4 sm:p-6 md:p-8">
+                <div className="flex items-start space-x-3 sm:space-x-4 mb-4 sm:mb-6">
+                  <div className="flex-shrink-0 bg-green-100 rounded-full p-2 sm:p-3">
+                    <Package className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                    <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
                       {t('cookie.title')}
                     </h2>
-                    <p className="text-gray-600 text-base md:text-lg leading-relaxed">
+                    <p className="text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed">
                       {t('cookie.description')}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
                   <button
                     onClick={handleAcceptAll}
-                    className="flex-1 bg-cta hover:bg-cta-hover text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-2"
+                    className="flex-1 bg-cta hover:bg-cta-hover text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-2 text-sm sm:text-base"
                   >
-                    <CheckCircle className="w-5 h-5" />
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>{t('cookie.acceptAll')}</span>
                   </button>
 
                   <button
                     onClick={handleAcceptNecessary}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 text-sm sm:text-base"
                   >
                     {t('cookie.acceptNecessary')}
                   </button>
 
                   <button
                     onClick={() => setShowCustomize(true)}
-                    className="flex-1 border-2 border-green-600 text-green-600 hover:bg-green-50 font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
+                    className="flex-1 border-2 border-green-600 text-green-600 hover:bg-green-50 font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base"
                   >
-                    <Settings className="w-5 h-5" />
+                    <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>{t('cookie.customize')}</span>
                   </button>
                 </div>
@@ -141,59 +141,57 @@ export default function CookieBanner() {
               </div>
             ) : (
               /* Customize Panel */
-              <div className="p-6 md:p-8">
+              <div className="p-4 sm:p-6 md:p-8">
                 <button
                   onClick={() => setShowCustomize(false)}
-                  className="mb-4 text-green-600 hover:text-green-700 flex items-center space-x-2"
+                  className="mb-3 sm:mb-4 text-green-600 hover:text-green-700 flex items-center space-x-2"
                 >
-                  <X className="w-5 h-5" />
-                  <span className="font-semibold">Zpět</span>
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="font-semibold text-sm sm:text-base">Zpět</span>
                 </button>
 
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
                   {t('cookie.customize')}
                 </h2>
 
                 {/* Necessary Cookies */}
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
-                  <div className="flex items-start justify-between">
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <Package className="w-5 h-5 text-gray-600" />
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <Package className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                           {t('cookie.necessary.title')}
                         </h3>
                       </div>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 text-xs sm:text-sm">
                         {t('cookie.necessary.description')}
                       </p>
                     </div>
-                    <div className="ml-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-semibold text-gray-500">Vždy aktivní</span>
-                        <div className="w-12 h-6 bg-green-600 rounded-full flex items-center justify-end px-1 cursor-not-allowed opacity-50">
-                          <div className="w-4 h-4 bg-white rounded-full"></div>
-                        </div>
+                    <div className="flex items-center justify-between sm:justify-end sm:ml-4">
+                      <span className="text-xs sm:text-sm font-semibold text-gray-500">Vždy aktivní</span>
+                      <div className="w-12 h-6 bg-green-600 rounded-full flex items-center justify-end px-1 cursor-not-allowed opacity-50 ml-2">
+                        <div className="w-4 h-4 bg-white rounded-full"></div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Marketing Cookies */}
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
-                  <div className="flex items-start justify-between">
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <Package className="w-5 h-5 text-green-600" />
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <Package className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                           {t('cookie.marketing.title')}
                         </h3>
                       </div>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 text-xs sm:text-sm">
                         {t('cookie.marketing.description')}
                       </p>
                     </div>
-                    <div className="ml-4">
+                    <div className="flex items-center justify-end sm:ml-4">
                       <button
                         onClick={() => setMarketingEnabled(!marketingEnabled)}
                         className={`w-12 h-6 rounded-full transition-colors duration-200 flex items-center ${
@@ -206,17 +204,17 @@ export default function CookieBanner() {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
                   <button
                     onClick={handleSaveCustom}
-                    className="flex-1 bg-cta hover:bg-cta-hover text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
+                    className="flex-1 bg-cta hover:bg-cta-hover text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
                   >
                     {t('cookie.savePreferences')}
                   </button>
 
                   <button
                     onClick={() => setShowCustomize(false)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all duration-200 text-sm sm:text-base"
                   >
                     Zrušit
                   </button>
