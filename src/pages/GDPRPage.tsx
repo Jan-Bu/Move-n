@@ -46,29 +46,25 @@ export default function GDPRPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Intro */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <FileText className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('gdpr.intro.title')}</h2>
-                <p className="text-gray-700 leading-relaxed">{t('gdpr.intro.content')}</p>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <FileText className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('gdpr.intro.title')}</h2>
             </div>
+            <p className="text-gray-700 leading-relaxed">{t('gdpr.intro.content')}</p>
           </section>
 
           {/* Controller */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <User className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('gdpr.controller.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-1">
-                  <p className="font-semibold">{t('gdpr.controller.company')}</p>
-                  <p>{t('gdpr.controller.id')}</p>
-                  <p>{t('gdpr.controller.address')}</p>
-                  <p>E-mail: khaled.rami1990@gmail.com</p>
-                  <p>{t('contact.phone')}: +420 777 535 749</p>
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <User className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('gdpr.controller.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-1">
+              <p className="font-semibold">{t('gdpr.controller.company')}</p>
+              <p>{t('gdpr.controller.id')}</p>
+              <p>{t('gdpr.controller.address')}</p>
+              <p>E-mail: khaled.rami1990@gmail.com</p>
+              <p>{t('contact.phone')}: +420 777 535 749</p>
             </div>
           </section>
 
@@ -121,14 +117,12 @@ export default function GDPRPage() {
 
           {/* Rights */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <Lock className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('gdpr.rights.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('gdpr.rights.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <Lock className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('gdpr.rights.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('gdpr.rights.content'))}
             </div>
           </section>
 

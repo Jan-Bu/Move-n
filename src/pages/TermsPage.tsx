@@ -46,141 +46,119 @@ export default function TermsPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Intro */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <FileText className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.intro.title')}</h2>
-                <p className="text-gray-700 leading-relaxed">{t('terms.intro.content')}</p>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <FileText className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.intro.title')}</h2>
             </div>
+            <p className="text-gray-700 leading-relaxed">{t('terms.intro.content')}</p>
           </section>
 
           {/* Provider */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <Building className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.provider.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-1">
-                  {t('terms.provider.company') && <p className="font-semibold">{t('terms.provider.company')}</p>}
-                  {t('terms.provider.id') && <p>{t('terms.provider.id')}</p>}
-                  {t('terms.provider.address') && <p>{t('terms.provider.address')}</p>}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <Building className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.provider.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-1">
+              {t('terms.provider.company') && <p className="font-semibold">{t('terms.provider.company')}</p>}
+              {t('terms.provider.id') && <p>{t('terms.provider.id')}</p>}
+              {t('terms.provider.address') && <p>{t('terms.provider.address')}</p>}
             </div>
           </section>
 
           {/* Services */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <Package className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.services.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('terms.services.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <Package className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.services.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('terms.services.content'))}
             </div>
           </section>
 
           {/* Order */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.order.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('terms.order.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <CheckCircle className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.order.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('terms.order.content'))}
             </div>
           </section>
 
           {/* Price */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <CreditCard className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.price.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('terms.price.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <CreditCard className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.price.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('terms.price.content'))}
             </div>
           </section>
 
           {/* Customer Obligations */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <Users className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.customer.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('terms.customer.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <Users className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.customer.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('terms.customer.content'))}
             </div>
           </section>
 
           {/* Provider Responsibility */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <ShieldCheck className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.provider.resp.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('terms.provider.resp.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <ShieldCheck className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.provider.resp.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('terms.provider.resp.content'))}
             </div>
           </section>
 
           {/* Insurance */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <AlertCircle className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.insurance.title')}</h2>
-                <p className="text-gray-700 leading-relaxed">{t('terms.insurance.content')}</p>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <AlertCircle className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.insurance.title')}</h2>
             </div>
+            <p className="text-gray-700 leading-relaxed">{t('terms.insurance.content')}</p>
           </section>
 
           {/* Cancellation */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <XCircle className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.cancellation.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('terms.cancellation.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <XCircle className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.cancellation.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('terms.cancellation.content'))}
             </div>
           </section>
 
           {/* Complaints */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <MessageSquare className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.complaints.title')}</h2>
-                <div className="text-gray-700 leading-relaxed space-y-2">
-                  {formatContent(t('terms.complaints.content'))}
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <MessageSquare className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.complaints.title')}</h2>
+            </div>
+            <div className="text-gray-700 leading-relaxed space-y-2">
+              {formatContent(t('terms.complaints.content'))}
             </div>
           </section>
 
           {/* Personal Data */}
           <section className="mb-12 bg-white rounded-lg shadow-sm p-8">
-            <div className="flex items-start space-x-4">
-              <Lock className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('terms.personal.title')}</h2>
-                <p className="text-gray-700 leading-relaxed">{t('terms.personal.content')}</p>
-              </div>
+            <div className="flex flex-col items-center text-center mb-6">
+              <Lock className="w-12 h-12 text-green-600 mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900">{t('terms.personal.title')}</h2>
             </div>
+            <p className="text-gray-700 leading-relaxed">{t('terms.personal.content')}</p>
           </section>
 
           {/* Final Provisions */}
