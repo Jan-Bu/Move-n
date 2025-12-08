@@ -17,10 +17,10 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { href: '#sluzby', label: t('nav.services') },
-    { href: '#o-nas', label: t('nav.about') },
-    { href: '#recenze', label: t('nav.reviews') },
-    { href: '#kontakt', label: t('nav.contact') },
+    { href: '/#sluzby', label: t('nav.services') },
+    { href: '/#o-nas', label: t('nav.about') },
+    { href: '/#recenze', label: t('nav.reviews') },
+    { href: '/#kontakt', label: t('nav.contact') },
   ];
 
   return (
