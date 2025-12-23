@@ -40,6 +40,8 @@ function getDefaultServices(): Services {
     packingService: false,
     materials: getDefaultMaterials(),
     insurance: true,
+    hasHeavyItems: false,
+    heavyItemsCount: 0,
   };
 }
 

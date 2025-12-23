@@ -37,6 +37,8 @@ export interface Services {
   packingService: boolean;
   materials: Materials;
   insurance: boolean;
+  hasHeavyItems: boolean;
+  heavyItemsCount: number;
 }
 
 export interface Estimate {

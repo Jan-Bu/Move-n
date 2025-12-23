@@ -52,7 +52,7 @@ export default function HomePage() {
       <Services />
       <About />
 
-      <div id="moving-configurator-root" data-lang="cs" className="my-20"></div>
+      <div id="moving-configurator-root" data-lang="cs" data-slug="home" className="my-20"></div>
 
       <Reviews />
       <Contact />

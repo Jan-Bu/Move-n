@@ -665,6 +665,81 @@ function renderServices(container: HTMLElement, stateManager: StateManager): voi
 
   container.appendChild(servicesGroup);
 
+  // Heavy items section
+  const heavyItemsSection = document.createElement('div');
+  heavyItemsSection.className = 'heavy-items-section';
+  heavyItemsSection.style.marginTop = '1.5rem';
+  heavyItemsSection.style.padding = '1rem';
+  heavyItemsSection.style.backgroundColor = '#f8f9fa';
+  heavyItemsSection.style.borderRadius = '8px';
+
+  const heavyItemsCheckbox = createCheckbox(
+    state.services.hasHeavyItems,
+    (val) => {
+      stateManager.setServices({
+        ...state.services,
+        hasHeavyItems: val,
+        heavyItemsCount: val ? (state.services.heavyItemsCount || 1) : 0
+      });
+    },
+    t(state.lang, 'services.heavyItems') + ' (+1000 Kč/kus)'
+  );
+
+  // Make the label bold
+  const label = heavyItemsCheckbox.querySelector('label');
+  if (label) {
+    label.style.fontWeight = '600';
+    label.style.fontSize = '1rem';
+  }
+
+  heavyItemsSection.appendChild(heavyItemsCheckbox);
+
+  if (state.services.hasHeavyItems) {
+    const counterWrapper = document.createElement('div');
+    counterWrapper.style.marginTop = '1rem';
+    counterWrapper.style.marginLeft = '1.5rem';
+    counterWrapper.style.padding = '0.75rem';
+    counterWrapper.style.backgroundColor = '#ffffff';
+    counterWrapper.style.borderRadius = '6px';
+    counterWrapper.style.border = '1px solid #e5e7eb';
+
+    const counterLabel = document.createElement('label');
+    counterLabel.textContent = t(state.lang, 'services.heavyItemsCount');
+    counterLabel.style.display = 'block';
+    counterLabel.style.marginBottom = '0.75rem';
+    counterLabel.style.fontSize = '0.95rem';
+    counterLabel.style.fontWeight = '600';
+    counterLabel.style.color = '#374151';
+    counterWrapper.appendChild(counterLabel);
+
+    const counter = createCounter(
+      state.services.heavyItemsCount,
+      () => {
+        stateManager.setServices({
+          ...state.services,
+          heavyItemsCount: state.services.heavyItemsCount + 1
+        });
+      },
+      () => {
+        stateManager.setServices({
+          ...state.services,
+          heavyItemsCount: Math.max(1, state.services.heavyItemsCount - 1)
+        });
+      },
+      (newCount) => {
+        stateManager.setServices({
+          ...state.services,
+          heavyItemsCount: Math.max(1, newCount)
+        });
+      }
+    );
+
+    counterWrapper.appendChild(counter);
+    heavyItemsSection.appendChild(counterWrapper);
+  }
+
+  container.appendChild(heavyItemsSection);
+
   // Photos
   const photoSection = document.createElement('div');
   photoSection.className = 'photo-section';
@@ -879,6 +954,7 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
       state.services.assembly && t(state.lang, 'services.assembly'),
       state.services.packingService && t(state.lang, 'services.packing'),
       state.services.insurance && t(state.lang, 'services.insurance'),
+      state.services.hasHeavyItems && `${t(state.lang, 'services.heavyItems')} (${state.services.heavyItemsCount}× po 1000 Kč)`,
     ].filter(Boolean) as string[];
     if (selected.length) {
       const ul = document.createElement('ul');
@@ -906,6 +982,7 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
       elevatorTo: state.to.elevatorType ?? null,
       hasElevatorFrom: state.from.elevator,
       hasElevatorTo: state.to.elevator,
+      heavyItemsCount: state.services.hasHeavyItems ? state.services.heavyItemsCount : 0,
     });
 
     const priceDiv = document.createElement('div');

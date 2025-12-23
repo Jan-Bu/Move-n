@@ -66,61 +66,9 @@ function itemFitsInElevator(itemKey: string, elevatorSize: ElevatorCapacity): bo
   return true;
 }
 
-// Odhad váhy předmětu
-function estimateItemWeight(itemKey: string): number {
-  const weights: Record<string, number> = {
-    // Heavy items (120+ kg)
-    sofa4seat: 150,
-    sofa3seat: 120,
-    wardrobe4door: 150,
-    wardrobe3door: 120,
-    chinaHutch: 130,
-
-    // Medium-heavy (80-120 kg)
-    sofa2seat: 90,
-    bedDouble: 100,
-    mattressDouble: 80,
-    wardrobe2door: 100,
-    fridge: 90,
-    fridgeFreezer: 100,
-    washingMachine: 80,
-    washingMachineBath: 80,
-    dryer: 80,
-    dryerBath: 80,
-    bookcase: 90,
-    diningTable: 85,
-
-    // Light-medium (50-80 kg)
-    armchair: 60,
-    bedSingle: 70,
-    mattressSingle: 50,
-    dresser: 65,
-    sideboard: 70,
-    tvStand: 55,
-    kitchenTable: 60,
-    freezer: 75,
-    dishwasher: 70,
-    desk: 65,
-    filingCabinet: 60,
-    bookshelf: 70,
-    babyCrib: 50,
-    toddlerBed: 55,
-    changingTable: 50,
-    workbench: 75,
-    shelving: 60,
-    garageCabinet: 65,
-    gardenFurnitureSet: 80,
-  };
-
-  return weights[itemKey] || 0; // 0 = lehký předmět
-}
-
-// Získání příplatku za těžký předmět
-function getHeavyItemSurcharge(weight: number, quantity: number): number {
-  if (weight >= 120) return 1500 * quantity;
-  if (weight >= 80) return 900 * quantity;
-  if (weight >= 50) return 400 * quantity;
-  return 0;
+// Příplatek za těžké předměty - nyní na základě manuálního vstupu uživatele
+function getHeavyItemSurcharge(heavyItemsCount: number): number {
+  return heavyItemsCount * 1000;
 }
 
 export interface PriceCalculationInput {
@@ -133,6 +81,7 @@ export interface PriceCalculationInput {
   elevatorTo: ElevatorType | null | undefined;
   hasElevatorFrom: boolean;
   hasElevatorTo: boolean;
+  heavyItemsCount: number;
   workers?: number;
   hourlyRate?: number;
 }
@@ -168,6 +117,7 @@ export function calculateMovingPrice(input: PriceCalculationInput): PriceCalcula
     elevatorTo,
     hasElevatorFrom,
     hasElevatorTo,
+    heavyItemsCount,
     workers = DEFAULT_WORKERS,
     hourlyRate = DEFAULT_HOURLY_RATE,
   } = input;
@@ -241,12 +191,8 @@ export function calculateMovingPrice(input: PriceCalculationInput): PriceCalcula
   const avgFloor = ((floorFrom || 0) + (floorTo || 0)) / 2;
   const stairSurcharge = stairItemsCount > 0 ? STAIR_SURCHARGE_PER_FLOOR * Math.ceil(avgFloor) : 0;
 
-  // 7. Příplatek za těžké předměty
-  let heavyItemSurcharge = 0;
-  items.forEach(({ key, qty }) => {
-    const weight = estimateItemWeight(key);
-    heavyItemSurcharge += getHeavyItemSurcharge(weight, qty);
-  });
+  // 7. Příplatek za těžké předměty (manuální vstup od uživatele)
+  const heavyItemSurcharge = getHeavyItemSurcharge(heavyItemsCount);
 
   // 8. Ceny
   const laborPrice = Math.ceil(totalHours * hourlyRate * workers);
