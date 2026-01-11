@@ -33,13 +33,20 @@ export async function calculateDistance(
 
     // Extract distance from response (in meters, convert to km)
     const distanceMeters = data?.length || 0;
-    const distanceKm = distanceMeters / 1000;
+    let distanceKm = distanceMeters / 1000;
 
     console.log('📍 Routing API distance:', distanceKm, 'km');
 
     if (distanceKm === 0) {
       // Fallback to Haversine if routing failed
-      return calculateDistanceHaversine(lat1, lon1, lat2, lon2);
+      distanceKm = calculateDistanceHaversine(lat1, lon1, lat2, lon2);
+    }
+
+    // Minimum distance for local moves (same city)
+    const MIN_DISTANCE = 5;
+    if (distanceKm < MIN_DISTANCE) {
+      console.log(`📍 Distance ${distanceKm} km is below minimum, using ${MIN_DISTANCE} km`);
+      distanceKm = MIN_DISTANCE;
     }
 
     return Math.round(distanceKm * 10) / 10; // Round to 1 decimal place
@@ -71,7 +78,14 @@ function calculateDistanceHaversine(
       Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c;
+  let distance = R * c;
+
+  // Minimum distance for local moves (same city)
+  const MIN_DISTANCE = 5;
+  if (distance < MIN_DISTANCE) {
+    console.log(`📍 Haversine distance ${distance} km is below minimum, using ${MIN_DISTANCE} km`);
+    distance = MIN_DISTANCE;
+  }
 
   console.log('📍 Haversine fallback distance:', Math.round(distance * 10) / 10, 'km');
   return Math.round(distance * 10) / 10; // Round to 1 decimal place

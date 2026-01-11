@@ -868,7 +868,8 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
 
   const labelForElevatorType = (value?: string | null) => {
     if (!value) return '';
-    return t(state.lang, `address.elevatorType.${value as any}`);
+    const key = `address.elevatorType.${value}`;
+    return t(state.lang, key as any);
   };
 
   renderStepper(container, state);
@@ -971,7 +972,7 @@ function renderSummary(container: HTMLElement, stateManager: StateManager): void
   }
 
   // Price calculation
-  if (state.distance && state.estimate.volumeM3 > 0) {
+  if (state.distance !== undefined && state.estimate.volumeM3 > 0) {
     const priceResult = calculateMovingPrice({
       volumeM3: state.estimate.volumeM3,
       distanceKm: state.distance,
