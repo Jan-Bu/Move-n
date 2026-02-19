@@ -70,12 +70,27 @@ function getStorageKey(lang: Lang, pageSlug: string): string {
   return `move-n-configurator-${lang}-${pageSlug}`;
 }
 
+function isReloadNavigation(): boolean {
+  if (typeof window === 'undefined' || typeof performance === 'undefined') return false;
+
+  const navEntries = performance.getEntriesByType?.('navigation');
+  if (navEntries && navEntries.length > 0) {
+    const firstEntry = navEntries[0] as PerformanceNavigationTiming;
+    return firstEntry.type === 'reload';
+  }
+
+  const legacyNavigation = (performance as Performance & { navigation?: { type?: number } }).navigation;
+  return legacyNavigation?.type === 1;
+}
+
+let clearPersistedStateOnFirstLoad = isReloadNavigation();
+
 function canUseStorage(): boolean {
   try {
     if (typeof window === 'undefined') return false;
     const testKey = '__cfg_test__';
-    window.localStorage.setItem(testKey, '1');
-    window.localStorage.removeItem(testKey);
+    window.sessionStorage.setItem(testKey, '1');
+    window.sessionStorage.removeItem(testKey);
     return true;
   } catch {
     return false;
@@ -92,7 +107,7 @@ export function saveState(state: ConfiguratorState): void {
   if (!canUseStorage()) return;
   try {
     const key = getStorageKey(state.lang, state.pageSlug);
-    localStorage.setItem(key, JSON.stringify(state));
+    window.sessionStorage.setItem(key, JSON.stringify(state));
   } catch (error) {
     console.error('Failed to save configurator state:', error);
   }
@@ -101,8 +116,14 @@ export function saveState(state: ConfiguratorState): void {
 export function loadState(lang: Lang, pageSlug: string): ConfiguratorState | null {
   if (!canUseStorage()) return null;
   try {
+    if (clearPersistedStateOnFirstLoad) {
+      clearPersistedStateOnFirstLoad = false;
+      clearState(lang, pageSlug);
+      return null;
+    }
+
     const key = getStorageKey(lang, pageSlug);
-    const saved = localStorage.getItem(key);
+    const saved = window.sessionStorage.getItem(key);
     if (!saved) return null;
     const parsed = JSON.parse(saved) as ConfiguratorState;
 
@@ -130,7 +151,7 @@ export function clearState(lang: Lang, pageSlug: string): void {
   if (!canUseStorage()) return;
   try {
     const key = getStorageKey(lang, pageSlug);
-    localStorage.removeItem(key);
+    window.sessionStorage.removeItem(key);
   } catch (error) {
     console.error('Failed to clear configurator state:', error);
   }
