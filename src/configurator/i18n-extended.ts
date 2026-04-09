@@ -8,7 +8,9 @@ export const translations: Record<Lang, Dict> = {
     'room.livingRoom': 'Obývací pokoj',
     'room.bedroom': 'Ložnice',
     'room.kitchen': 'Kuchyň',
-    'room.diningRoom': 'Jídelna',
+    
+
+    
     'room.office': 'Pracovna',
     'room.bathroom': 'Koupelna',
     'room.childRoom': 'Dětský pokoj',

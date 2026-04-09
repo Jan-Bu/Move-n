@@ -45,6 +45,18 @@ export interface Estimate {
   volumeM3: number;
 }
 
+export interface SubmittedPriceEstimate {
+  numberOfTrips: number;
+  loadTimeMinutes: number;
+  unloadTimeMinutes: number;
+  totalHours: number;
+  laborPrice: number;
+  transportPrice: number;
+  stairSurcharge: number;
+  heavyItemSurcharge: number;
+  finalPrice: number;
+}
+
 export interface PhotoFile {
   name: string;
   base64: string;
@@ -101,5 +113,6 @@ export type Payload = Omit<
   preferredWindow?: TimeWindow; // string ve formátu "HH:MM"
   phone?: string;
   other?: string;
+  priceEstimate?: SubmittedPriceEstimate;
   timestamp: string;
 };

@@ -1,7 +1,23 @@
 import { ConfiguratorState, Payload } from '../types';
+import { calculateMovingPrice } from './priceCalculator';
 import { trackSubmitSuccess, trackSubmitFail } from './analytics';
 
 export async function submitQuote(state: ConfiguratorState): Promise<{ success: boolean; error?: string }> {
+  const priceEstimate = state.distance !== undefined && state.estimate.volumeM3 > 0
+    ? calculateMovingPrice({
+        volumeM3: state.estimate.volumeM3,
+        distanceKm: state.distance,
+        items: state.inventory.map(({ key, qty }) => ({ key, qty })),
+        floorFrom: state.from.floor,
+        floorTo: state.to.floor,
+        elevatorFrom: state.from.elevatorType ?? null,
+        elevatorTo: state.to.elevatorType ?? null,
+        hasElevatorFrom: state.from.elevator,
+        hasElevatorTo: state.to.elevator,
+        heavyItemsCount: state.services.hasHeavyItems ? state.services.heavyItemsCount : 0,
+      })
+    : undefined;
+
   const payload: Payload = {
     lang: state.lang,
     pageSlug: state.pageSlug,
@@ -18,6 +34,19 @@ export async function submitQuote(state: ConfiguratorState): Promise<{ success: 
     email: state.email,
     phone: state.phone || undefined,
     consent: state.consent,
+    priceEstimate: priceEstimate
+      ? {
+          numberOfTrips: priceEstimate.numberOfTrips,
+          loadTimeMinutes: priceEstimate.loadTimeMinutes,
+          unloadTimeMinutes: priceEstimate.unloadTimeMinutes,
+          totalHours: priceEstimate.totalHours,
+          laborPrice: priceEstimate.laborPrice,
+          transportPrice: priceEstimate.transportPrice,
+          stairSurcharge: priceEstimate.stairSurcharge,
+          heavyItemSurcharge: priceEstimate.heavyItemSurcharge,
+          finalPrice: priceEstimate.finalPrice,
+        }
+      : undefined,
     timestamp: new Date().toISOString(),
   };
 

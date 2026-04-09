@@ -1,11 +1,24 @@
 import type { Context } from "@netlify/functions";
 import nodemailer from "nodemailer";
+import { calculateMovingPrice, type PriceCalculationResult } from "../../src/configurator/services/priceCalculator";
 
 interface PhotoFile {
   name: string;
   base64: string;
   size: number;
   type: string;
+}
+
+interface SubmittedPriceEstimate {
+  numberOfTrips: number;
+  loadTimeMinutes: number;
+  unloadTimeMinutes: number;
+  totalHours: number;
+  laborPrice: number;
+  transportPrice: number;
+  stairSurcharge: number;
+  heavyItemSurcharge: number;
+  finalPrice: number;
 }
 
 type ElevatorType = 'elevator_1_3' | 'elevator_4_6' | 'elevator_7_9' | 'elevator_10plus';
@@ -42,6 +55,8 @@ interface QuoteRequest {
     assembly: boolean;
     packingService: boolean;
     insurance: boolean;
+    hasHeavyItems?: boolean;
+    heavyItemsCount?: number;
   };
   estimate: {
     volumeM3: number;
@@ -50,23 +65,11 @@ interface QuoteRequest {
   preferredWindow?: string;
   email: string;
   phone?: string;
+  priceEstimate?: SubmittedPriceEstimate;
   timestamp: string;
 }
 
 // Price calculation constants
-const VEHICLE_CAPACITY_M3 = 17;
-const BASE_LOAD_TIME_MINUTES = 120;
-const STAIR_SURCHARGE_PER_FLOOR = 200;
-const DEFAULT_HOURLY_RATE = 500;
-const PRICE_PER_KM = 20;
-const DEFAULT_WORKERS = 2;
-
-const FLOOR_COEFFICIENTS = {
-  ground: 1.0,
-  withElevator: 1.2,
-  stairs: 1.5,
-};
-
 // Helper funkce pro překlad typu výtahu
 function getElevatorTypeLabel(type: ElevatorType | null | undefined, lang: string): string {
   if (!type) return '';
@@ -139,51 +142,31 @@ function getHeavyItemSurcharge(weight: number, quantity: number): number {
 }
 
 // Price calculation function (simplified version)
-function calculatePrice(quote: QuoteRequest) {
+function calculatePrice(quote: QuoteRequest): PriceCalculationResult | null {
   if (!quote.distance || quote.estimate.volumeM3 === 0) {
     return null;
   }
 
-  const numberOfTrips = Math.ceil(quote.estimate.volumeM3 / VEHICLE_CAPACITY_M3);
-
-  // Calculate time
-  const volumeFactor = quote.estimate.volumeM3 / VEHICLE_CAPACITY_M3;
-  const coefficientFrom = quote.from.floor > 0 ? (quote.from.elevator ? FLOOR_COEFFICIENTS.withElevator : FLOOR_COEFFICIENTS.stairs) : FLOOR_COEFFICIENTS.ground;
-  const coefficientTo = quote.to.floor > 0 ? (quote.to.elevator ? FLOOR_COEFFICIENTS.withElevator : FLOOR_COEFFICIENTS.stairs) : FLOOR_COEFFICIENTS.ground;
-
-  const loadTimeMinutes = BASE_LOAD_TIME_MINUTES * volumeFactor * coefficientFrom;
-  const unloadTimeMinutes = BASE_LOAD_TIME_MINUTES * volumeFactor * coefficientTo;
-  const totalMinutes = loadTimeMinutes + unloadTimeMinutes;
-  const totalHours = totalMinutes / 60;
-
-  // Calculate stair surcharge
-  const avgFloor = ((quote.from.floor || 0) + (quote.to.floor || 0)) / 2;
-  const hasStairs = (quote.from.floor > 0 && !quote.from.elevator) || (quote.to.floor > 0 && !quote.to.elevator);
-  const stairSurcharge = hasStairs ? STAIR_SURCHARGE_PER_FLOOR * Math.ceil(avgFloor) : 0;
-
-  // Calculate heavy item surcharge
-  let heavyItemSurcharge = 0;
-  quote.inventory.forEach(({ key, qty }) => {
-    const weight = estimateItemWeight(key);
-    heavyItemSurcharge += getHeavyItemSurcharge(weight, qty);
+  return calculateMovingPrice({
+    volumeM3: quote.estimate.volumeM3,
+    distanceKm: quote.distance,
+    items: quote.inventory.map(({ key, qty }) => ({ key, qty })),
+    floorFrom: quote.from.floor,
+    floorTo: quote.to.floor,
+    elevatorFrom: quote.from.elevatorType ?? null,
+    elevatorTo: quote.to.elevatorType ?? null,
+    hasElevatorFrom: quote.from.elevator,
+    hasElevatorTo: quote.to.elevator,
+    heavyItemsCount: quote.services.hasHeavyItems ? (quote.services.heavyItemsCount ?? 0) : 0,
   });
+}
 
-  // Calculate prices
-  const laborPrice = Math.ceil(totalHours * DEFAULT_HOURLY_RATE * DEFAULT_WORKERS);
-  const transportPrice = Math.ceil(quote.distance * PRICE_PER_KM);
-  const finalPrice = laborPrice + transportPrice + stairSurcharge + heavyItemSurcharge;
+function resolvePriceEstimate(quote: QuoteRequest): SubmittedPriceEstimate | PriceCalculationResult | null {
+  if (quote.priceEstimate) {
+    return quote.priceEstimate;
+  }
 
-  return {
-    numberOfTrips,
-    loadTimeMinutes: Math.ceil(loadTimeMinutes),
-    unloadTimeMinutes: Math.ceil(unloadTimeMinutes),
-    totalHours: Math.round(totalHours * 100) / 100,
-    laborPrice,
-    transportPrice,
-    stairSurcharge,
-    heavyItemSurcharge,
-    finalPrice,
-  };
+  return calculatePrice(quote);
 }
 
 export default async (req: Request, context: Context) => {
@@ -234,7 +217,7 @@ export default async (req: Request, context: Context) => {
     console.log('Inventory:', JSON.stringify(quote.inventory, null, 2));
 
     // Calculate price ONCE for both emails
-    const priceCalc = calculatePrice(quote);
+    const priceCalc = resolvePriceEstimate(quote);
     console.log('=== PRICE CALCULATION ===');
     console.log('Price result:', priceCalc);
 
