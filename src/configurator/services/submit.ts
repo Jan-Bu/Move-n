@@ -1,6 +1,6 @@
 import { ConfiguratorState, Payload } from '../types';
 import { calculateMovingPrice } from './priceCalculator';
-import { trackSubmitSuccess, trackSubmitFail } from './analytics';
+import { trackGoogleAdsConversion, trackSubmitSuccess, trackSubmitFail } from './analytics';
 
 export async function submitQuote(state: ConfiguratorState): Promise<{ success: boolean; error?: string }> {
   const priceEstimate = state.distance !== undefined && state.estimate.volumeM3 > 0
@@ -81,6 +81,7 @@ export async function submitQuote(state: ConfiguratorState): Promise<{ success: 
     }
 
     trackSubmitSuccess(state.lang, state.pageSlug, state.estimate.volumeM3);
+    trackGoogleAdsConversion();
 
     return { success: true };
   } catch (error) {

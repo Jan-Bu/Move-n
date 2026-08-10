@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Truck, Package, Shield, MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import MovingAnimation from '../components/MovingAnimation';
+import { trackGoogleAdsConversion } from '../configurator/services/analytics';
 
 export default function EnglishMovingPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+
   useEffect(() => {
     document.documentElement.lang = 'en';
     document.title = 'Moving Services Across the Czech Republic and Europe | MOVI-N';
@@ -54,6 +58,44 @@ export default function EnglishMovingPage() {
       document.querySelectorAll('link[rel="alternate"]').forEach(altLink => altLink.remove());
     };
   }, []);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const body = new URLSearchParams();
+
+    formData.forEach((value, key) => {
+      if (typeof value === 'string') {
+        body.append(key, value);
+      }
+    });
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`English contact form submit failed with status ${response.status}`);
+      }
+
+      trackGoogleAdsConversion();
+      form.reset();
+      setSubmitMessage('Thank you, your inquiry has been sent successfully.');
+    } catch (error) {
+      console.error('Failed to submit English contact form:', error);
+      setSubmitMessage('Sending failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -229,7 +271,22 @@ export default function EnglishMovingPage() {
             </div>
 
             <div>
-              <form className="space-y-6 bg-gray-50 p-8 rounded-xl">
+              <form
+                name="contact"
+                method="POST"
+                data-netlify="true"
+                netlify-honeypot="bot-field"
+                className="space-y-6 bg-gray-50 p-8 rounded-xl"
+                onSubmit={handleSubmit}
+              >
+                <input type="hidden" name="form-name" value="contact" />
+                <input type="hidden" name="language" value="en" />
+                <p className="hidden">
+                  <label>
+                    Don't fill this out if you're human: <input name="bot-field" />
+                  </label>
+                </p>
+
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                     Full Name *
@@ -304,10 +361,17 @@ export default function EnglishMovingPage() {
 
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-cta text-white py-4 px-6 rounded-lg font-semibold hover:bg-cta-hover transition-all transform hover:scale-105 shadow-lg"
                 >
-                  Send Inquiry
+                  {isSubmitting ? 'Sending...' : 'Send Inquiry'}
                 </button>
+
+                {submitMessage && (
+                  <p className="text-sm text-gray-700 text-center" role="status">
+                    {submitMessage}
+                  </p>
+                )}
 
                 <p className="text-sm text-gray-600 text-center">
                   * Required fields. Your data is secure and will not be shared with third parties.

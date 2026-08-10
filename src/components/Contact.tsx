@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
+import { trackGoogleAdsConversion } from '../configurator/services/analytics';
 
 interface ContactProps {
   cityName?: string;
@@ -7,6 +8,8 @@ interface ContactProps {
 
 export default function Contact({ cityName }: ContactProps = {}) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,6 +28,52 @@ export default function Contact({ cityName }: ContactProps = {}) {
 
     return () => observer.disconnect();
   }, []);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const body = new URLSearchParams();
+
+    formData.forEach((value, key) => {
+      if (typeof value === 'string') {
+        body.append(key, value);
+      }
+    });
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Contact form submit failed with status ${response.status}`);
+      }
+
+      if (cityName) {
+        window.gtag?.('event', 'form_submit', {
+          event_category: 'Contact',
+          event_label: 'Contact Form',
+          city: cityName,
+        });
+      }
+
+      trackGoogleAdsConversion();
+      form.reset();
+      setSubmitMessage('Děkujeme, poptávka byla úspěšně odeslána.');
+    } catch (error) {
+      console.error('Failed to submit contact form:', error);
+      setSubmitMessage('Odeslání se nepodařilo. Zkuste to prosím znovu.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const contactInfo = [
     {
@@ -109,15 +158,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
               data-netlify="true"
               netlify-honeypot="bot-field"
               className="space-y-6"
-              onSubmit={() => {
-                if (window.gtag && cityName) {
-                  window.gtag('event', 'form_submit', {
-                    event_category: 'Contact',
-                    event_label: 'Contact Form',
-                    city: cityName
-                  });
-                }
-              }}
+              onSubmit={handleSubmit}
             >
               <input type="hidden" name="form-name" value="contact" />
               {cityName && <input type="hidden" name="city" value={cityName} />}
@@ -201,11 +242,18 @@ export default function Contact({ cityName }: ContactProps = {}) {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-cta text-white py-4 px-6 rounded-lg font-semibold hover:bg-cta-hover transition-all transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
               >
-                <span>Odeslat poptávku</span>
+                <span>{isSubmitting ? 'Odesílám...' : 'Odeslat poptávku'}</span>
                 <Send className="h-5 w-5" />
               </button>
+
+              {submitMessage && (
+                <p className="text-sm text-gray-700 text-center" role="status">
+                  {submitMessage}
+                </p>
+              )}
 
               <p className="text-sm text-gray-600 text-center">
                 * Povinná pole. Vaše údaje jsou v bezpečí a nebudou sdíleny s třetími stranami.

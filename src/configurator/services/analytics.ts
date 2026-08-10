@@ -4,8 +4,16 @@ export function trackEvent(
   eventName: string,
   params: Record<string, unknown> = {}
 ): void {
-  if (typeof window !== 'undefined' && window.gtag) {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
     window.gtag('event', eventName, params);
+  }
+}
+
+export function trackGoogleAdsConversion(): void {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag('event', 'conversion', {
+      send_to: 'AW-18052940057/H9QuCOKqn98cEJmCqKBD',
+    });
   }
 }
 
