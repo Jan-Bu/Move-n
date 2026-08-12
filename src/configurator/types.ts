@@ -107,12 +107,13 @@ export interface ValidationError {
 
 export type Payload = Omit<
   ConfiguratorState,
-  'currentStep' | 'preferredWindow' | 'preferredDate' | 'phone' | 'consent'
+  'currentStep' | 'preferredWindow' | 'preferredDate' | 'phone' | 'consent' | 'other'
 > & {
   preferredDate?: string;
   preferredWindow?: TimeWindow; // string ve formátu "HH:MM"
   phone?: string;
   other?: string;
+  consent?: boolean;
   priceEstimate?: SubmittedPriceEstimate;
   timestamp: string;
 };

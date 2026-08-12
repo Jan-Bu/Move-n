@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 import { trackGoogleAdsConversion } from '../configurator/services/analytics';
+import { submitContactForm } from '../services/contactSubmit';
 
 interface ContactProps {
   cityName?: string;
@@ -11,6 +12,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const submitInProgressRef = useRef(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -32,29 +34,26 @@ export default function Contact({ cityName }: ContactProps = {}) {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (submitInProgressRef.current) return;
+    submitInProgressRef.current = true;
+
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const body = new URLSearchParams();
-
-    formData.forEach((value, key) => {
-      if (typeof value === 'string') {
-        body.append(key, value);
-      }
-    });
 
     setIsSubmitting(true);
     setSubmitMessage(null);
 
     try {
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
+      await submitContactForm({
+        name: String(formData.get('name') || ''),
+        email: String(formData.get('email') || ''),
+        phone: String(formData.get('phone') || ''),
+        service: String(formData.get('service') || ''),
+        message: String(formData.get('message') || ''),
+        city: cityName,
+        language: 'cs',
+        timestamp: new Date().toISOString(),
       });
-
-      if (!response.ok) {
-        throw new Error(`Contact form submit failed with status ${response.status}`);
-      }
 
       if (cityName) {
         window.gtag?.('event', 'form_submit', {
@@ -71,6 +70,7 @@ export default function Contact({ cityName }: ContactProps = {}) {
       console.error('Failed to submit contact form:', error);
       setSubmitMessage('Odeslání se nepodařilo. Zkuste to prosím znovu.');
     } finally {
+      submitInProgressRef.current = false;
       setIsSubmitting(false);
     }
   };

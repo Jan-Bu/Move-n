@@ -1,13 +1,15 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Truck, Package, Shield, MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import MovingAnimation from '../components/MovingAnimation';
 import { trackGoogleAdsConversion } from '../configurator/services/analytics';
+import { submitContactForm } from '../services/contactSubmit';
 
 export default function EnglishMovingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const submitInProgressRef = useRef(false);
 
   useEffect(() => {
     document.documentElement.lang = 'en';
@@ -62,29 +64,25 @@ export default function EnglishMovingPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (submitInProgressRef.current) return;
+    submitInProgressRef.current = true;
+
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const body = new URLSearchParams();
-
-    formData.forEach((value, key) => {
-      if (typeof value === 'string') {
-        body.append(key, value);
-      }
-    });
 
     setIsSubmitting(true);
     setSubmitMessage(null);
 
     try {
-      const response = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
+      await submitContactForm({
+        name: String(formData.get('name') || ''),
+        email: String(formData.get('email') || ''),
+        phone: String(formData.get('phone') || ''),
+        service: String(formData.get('service') || ''),
+        message: String(formData.get('message') || ''),
+        language: 'en',
+        timestamp: new Date().toISOString(),
       });
-
-      if (!response.ok) {
-        throw new Error(`English contact form submit failed with status ${response.status}`);
-      }
 
       trackGoogleAdsConversion();
       form.reset();
@@ -93,6 +91,7 @@ export default function EnglishMovingPage() {
       console.error('Failed to submit English contact form:', error);
       setSubmitMessage('Sending failed. Please try again.');
     } finally {
+      submitInProgressRef.current = false;
       setIsSubmitting(false);
     }
   };

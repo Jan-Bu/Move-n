@@ -196,7 +196,33 @@ function composeStructuredAddress({
     parts.push(country);
   }
 
-  return parts.join(', ');
+  return composeUniqueAddress(parts);
+}
+
+function normalizeAddressComponent(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function composeUniqueAddress(components: string[]): string {
+  const seen = new Set<string>();
+
+  return components
+    .flatMap(component => component.split(','))
+    .map(component => component.trim())
+    .filter(component => {
+      if (!component) return false;
+
+      const normalized = normalizeAddressComponent(component);
+      if (seen.has(normalized)) return false;
+
+      seen.add(normalized);
+      return true;
+    })
+    .join(', ');
 }
 
 // Format address fallback
@@ -210,14 +236,14 @@ function formatAddress(item: any): string {
       a.postcode || a.zip,
       a.country,
     ]
-      .filter(Boolean)
-      .join(', ')
+      .filter(Boolean);
+    const formatted = composeUniqueAddress(parts)
       .replace(/\s+,/g, ',');
-    if (parts) return parts;
+    if (formatted) return formatted;
   }
   const label = item?.label;
   const location = item?.location;
-  if (label && location) return `${label}, ${location}`;
+  if (label && location) return composeUniqueAddress([label, location]);
   if (label) return label;
   return item?.name || '';
 }
@@ -274,7 +300,7 @@ export function setupAutocomplete(
       selector: () => input,
       placeHolder: input.placeholder || (lang === 'cs' ? 'Zadejte adresu…' : 'Enter your address…'),
       threshold: minChars,
-      searchEngine: (query: string, record: string) => `<mark>${record}</mark>`,
+      searchEngine: (_query: string, record: string) => `<mark>${record}</mark>`,
       data: {
         keys: ['value'],
         src: async (q: string) => {
@@ -376,7 +402,7 @@ export function setupAutocomplete(
         countryPart
       ].filter(p => p && p.trim());
       
-      const fullText = addressComponents.join(', ');
+      const fullText = composeUniqueAddress(addressComponents);
       
       console.log('✅ Final composed address:', fullText);
       console.log('   - Street:', streetPart);
