@@ -6,8 +6,8 @@ const BASE_LOAD_TIME_MINUTES = 120; // pro plný náklad 17m³
 const STAIR_SURCHARGE_PER_FLOOR = 200; // CZK
 
 // Hodinová sazba a cena za km
-const DEFAULT_HOURLY_RATE = 500; // CZK per worker
-const PRICE_PER_KM = 20; // CZK per km (one-way distance)
+const DEFAULT_HOURLY_RATE = 600; // CZK per worker
+const PRICE_PER_KM = 23; // CZK per km (one-way distance)
 const DEFAULT_WORKERS = 2;
 
 // Floor coefficients
