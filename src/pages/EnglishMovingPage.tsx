@@ -224,8 +224,8 @@ export default function EnglishMovingPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Email</p>
-                  <a href="mailto:khaled.rami1990@gmail.com" className="text-lg font-semibold text-gray-900 hover:text-green-600">
-                    khaled.rami1990@gmail.com
+                  <a href="mailto:stehovani@movi-n.cz" className="text-lg font-semibold text-gray-900 hover:text-green-600">
+                    stehovani@movi-n.cz
                   </a>
                 </div>
               </div>

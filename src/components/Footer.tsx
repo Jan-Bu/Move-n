@@ -98,8 +98,8 @@ export default function Footer({ lang = 'cs' }: FooterProps) {
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-primary" />
-                <a href="mailto:khaled.rami1990@gmail.com" className="text-gray-700 hover:text-primary transition-colors">
-                  khaled.rami1990@gmail.com
+                <a href="mailto:stehovani@movi-n.cz" className="text-gray-700 hover:text-primary transition-colors">
+                  stehovani@movi-n.cz
                 </a>
               </li>
             </ul>

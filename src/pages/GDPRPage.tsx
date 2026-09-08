@@ -63,7 +63,7 @@ export default function GDPRPage() {
               <p className="font-semibold">{t('gdpr.controller.company')}</p>
               <p>{t('gdpr.controller.id')}</p>
               <p>{t('gdpr.controller.address')}</p>
-              <p>E-mail: khaled.rami1990@gmail.com</p>
+              <p>E-mail: stehovani@movi-n.cz</p>
               <p>{t('contact.phone')}: +420 777 535 749</p>
             </div>
           </section>

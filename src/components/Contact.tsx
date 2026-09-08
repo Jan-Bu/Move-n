@@ -85,8 +85,8 @@ export default function Contact({ cityName }: ContactProps = {}) {
     {
       icon: Mail,
       title: 'Email',
-      value: 'khaled.rami1990@gmail.com',
-      href: 'mailto:khaled.rami1990@gmail.com',
+      value: 'stehovani@movi-n.cz',
+      href: 'mailto:stehovani@movi-n.cz',
     },
     {
       icon: MapPin,

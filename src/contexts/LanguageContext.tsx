@@ -60,14 +60,14 @@ const translations = {
     'gdpr.cookies.title': 'Cookies a webové stránky',
     'gdpr.cookies.content': 'Naše webové stránky používají cookies pro zajištění základní funkčnosti a analýzu návštěvnosti. Používáme pouze nezbytně nutné cookies.',
     'gdpr.contact.title': 'Kontakt pro otázky ohledně GDPR',
-    'gdpr.contact.content': 'Pro uplatnění vašich práv nebo dotazy ohledně zpracování osobních údajů nás kontaktujte:|E-mail: khaled.rami1990@gmail.com|Telefon: +420 777 535 749|Poštovní adresa: Převýšov 31, 503 51 Převýšov',
+    'gdpr.contact.content': 'Pro uplatnění vašich práv nebo dotazy ohledně zpracování osobních údajů nás kontaktujte:|E-mail: stehovani@movi-n.cz|Telefon: +420 777 535 749|Poštovní adresa: Převýšov 31, 503 51 Převýšov',
 
     // Terms Page
     'terms.title': 'Obchodní podmínky společnosti Movi-n',
     'terms.backToHome': 'Zpět na hlavní stránku',
     'terms.lastUpdated': 'Poslední aktualizace:',
     'terms.intro.title': '1. Úvodní ustanovení',
-    'terms.intro.content': 'Tyto obchodní podmínky (dále jen „Podmínky") upravují práva a povinnosti mezi společností:|Movi-n|IČO: 01110713|Sídlo: Převýšov 31, 503 51 Převýšov|E-mail: khaled.rami1990@gmail.com|Telefon: ‪+420 777 535 749‬|(dále jen „Poskytovatel")||a zákazníkem, který si objednává stěhovací služby (dále jen „Klient").|Poskytovatel je podnikatel zapsaný v živnostenském rejstříku a provozuje webové stránky, na kterých může Klient vyplnit poptávkový formulář k nezávazné poptávce stěhovacích služeb.',
+    'terms.intro.content': 'Tyto obchodní podmínky (dále jen „Podmínky") upravují práva a povinnosti mezi společností:|Movi-n|IČO: 01110713|Sídlo: Převýšov 31, 503 51 Převýšov|E-mail: stehovani@movi-n.cz|Telefon: ‪+420 777 535 749‬|(dále jen „Poskytovatel")||a zákazníkem, který si objednává stěhovací služby (dále jen „Klient").|Poskytovatel je podnikatel zapsaný v živnostenském rejstříku a provozuje webové stránky, na kterých může Klient vyplnit poptávkový formulář k nezávazné poptávce stěhovacích služeb.',
     'terms.provider.title': '1. Poskytovatel služby',
     'terms.provider.company': '',
     'terms.provider.id': '',
@@ -155,14 +155,14 @@ const translations = {
     'gdpr.cookies.title': 'Cookies and Website',
     'gdpr.cookies.content': 'Our website uses cookies to ensure basic functionality and analyze traffic. We only use strictly necessary cookies.',
     'gdpr.contact.title': 'Contact for GDPR Questions',
-    'gdpr.contact.content': 'To exercise your rights or for questions regarding personal data processing, contact us:|Email: khaled.rami1990@gmail.com|Phone: +420 777 535 749|Postal address: Převýšov 31, 503 51 Převýšov',
+    'gdpr.contact.content': 'To exercise your rights or for questions regarding personal data processing, contact us:|Email: stehovani@movi-n.cz|Phone: +420 777 535 749|Postal address: Převýšov 31, 503 51 Převýšov',
 
     // Terms Page
     'terms.title': 'Terms & Conditions of Movi-n',
     'terms.backToHome': 'Back to Home',
     'terms.lastUpdated': 'Last Updated:',
     'terms.intro.title': '1. Introductory Provisions',
-    'terms.intro.content': 'These Terms and Conditions (hereinafter "Terms") govern the rights and obligations between the company:|Movi-n|Company ID: 01110713|Registered office: Převýšov 31, 503 51 Převýšov|Email: khaled.rami1990@gmail.com|Phone: ‪+420 777 535 749‬|(hereinafter "Provider")||and the customer who orders moving services (hereinafter "Client").|The Provider is an entrepreneur registered in the Trade Register and operates a website where the Client can fill out an inquiry form for a non-binding request for moving services.',
+    'terms.intro.content': 'These Terms and Conditions (hereinafter "Terms") govern the rights and obligations between the company:|Movi-n|Company ID: 01110713|Registered office: Převýšov 31, 503 51 Převýšov|Email: stehovani@movi-n.cz|Phone: ‪+420 777 535 749‬|(hereinafter "Provider")||and the customer who orders moving services (hereinafter "Client").|The Provider is an entrepreneur registered in the Trade Register and operates a website where the Client can fill out an inquiry form for a non-binding request for moving services.',
     'terms.provider.title': '2. Subject of Service',
     'terms.provider.company': '',
     'terms.provider.id': '',
