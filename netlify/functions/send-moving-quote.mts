@@ -169,6 +169,17 @@ function resolvePriceEstimate(quote: QuoteRequest): SubmittedPriceEstimate | Pri
   return calculatePrice(quote);
 }
 
+function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function getConfiguredRecipients(emailTo: string): string[] {
+  return emailTo
+    .split(",")
+    .map(normalizeEmail)
+    .filter(Boolean);
+}
+
 export default async (req: Request, context: Context) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
@@ -599,19 +610,29 @@ export default async (req: Request, context: Context) => {
       html: clientEmailBody,
     };
 
-    // Poslat oba emaily
+    const adminRecipients = getConfiguredRecipients(emailTo);
+    const shouldSendClientConfirmation = !adminRecipients.includes(normalizeEmail(quote.email));
+
+    // Poslat email pro firmu vzdy; potvrzeni klientovi jen pokud neni stejny jako firemni prijemce.
     const adminInfo = await transporter.sendMail(adminMailOptions);
     console.log("Admin email sent successfully:", adminInfo.messageId);
 
-    const clientInfo = await transporter.sendMail(clientMailOptions);
-    console.log("Client email sent successfully:", clientInfo.messageId);
+    const clientInfo = shouldSendClientConfirmation
+      ? await transporter.sendMail(clientMailOptions)
+      : null;
+
+    if (clientInfo) {
+      console.log("Client email sent successfully:", clientInfo.messageId);
+    } else {
+      console.log("Client confirmation skipped because recipient matches EMAIL_TO.");
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
         message: "Quote submitted successfully",
         adminMessageId: adminInfo.messageId,
-        clientMessageId: clientInfo.messageId,
+        clientMessageId: clientInfo?.messageId ?? null,
       }),
       {
         status: 200,

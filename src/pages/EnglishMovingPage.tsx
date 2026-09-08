@@ -271,20 +271,10 @@ export default function EnglishMovingPage() {
 
             <div>
               <form
-                name="contact"
-                method="POST"
-                data-netlify="true"
-                netlify-honeypot="bot-field"
                 className="space-y-6 bg-gray-50 p-8 rounded-xl"
                 onSubmit={handleSubmit}
               >
-                <input type="hidden" name="form-name" value="contact" />
                 <input type="hidden" name="language" value="en" />
-                <p className="hidden">
-                  <label>
-                    Don't fill this out if you're human: <input name="bot-field" />
-                  </label>
-                </p>
 
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
