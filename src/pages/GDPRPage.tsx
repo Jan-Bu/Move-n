@@ -61,6 +61,7 @@ export default function GDPRPage() {
             </div>
             <div className="text-gray-700 leading-relaxed space-y-1">
               <p className="font-semibold">{t('gdpr.controller.company')}</p>
+              <p>{t('gdpr.controller.contactPerson')}</p>
               <p>{t('gdpr.controller.id')}</p>
               <p>{t('gdpr.controller.address')}</p>
               <p>E-mail: stehovani@movi-n.cz</p>
