@@ -1163,7 +1163,10 @@ function renderNavButtons(container: HTMLElement, stateManager: StateManager, is
       if (isSubmit) {
         try {
           const result = await submitQuote(state);
-          if (result.success) stateManager.nextStep();
+          if (result.success) {
+            const thankYouPath = state.lang === 'en' ? '/en/thank-you' : '/dekujeme';
+            window.location.assign(thankYouPath);
+          }
           else alert(`Error: ${result.error || 'Failed to submit'}`);
         } finally {
           nextBtn.disabled = false;

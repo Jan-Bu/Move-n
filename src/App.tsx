@@ -7,6 +7,7 @@ import CityPage from './pages/CityPage';
 import EnglishMovingPage from './pages/EnglishMovingPage';
 import GDPRPage from './pages/GDPRPage';
 import TermsPage from './pages/TermsPage';
+import ThankYouPage from './pages/ThankYouPage';
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
           <Route path="/en/moving-services" element={<EnglishMovingPage />} />
           <Route path="/gdpr" element={<GDPRPage />} />
           <Route path="/obchodni-podminky" element={<TermsPage />} />
+          <Route path="/dekujeme" element={<ThankYouPage />} />
+          <Route path="/en/thank-you" element={<ThankYouPage lang="en" />} />
           <Route path="/:citySlug" element={<CityPage />} />
         </Routes>
       </BrowserRouter>
