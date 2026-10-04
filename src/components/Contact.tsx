@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
-import { trackGoogleAdsConversion } from '../configurator/services/analytics';
 import { submitContactForm } from '../services/contactSubmit';
 
 interface ContactProps {
@@ -63,9 +62,8 @@ export default function Contact({ cityName }: ContactProps = {}) {
         });
       }
 
-      trackGoogleAdsConversion();
       form.reset();
-      setSubmitMessage('Děkujeme, poptávka byla úspěšně odeslána.');
+      window.location.assign('/dekujeme');
     } catch (error) {
       console.error('Failed to submit contact form:', error);
       setSubmitMessage('Odeslání se nepodařilo. Zkuste to prosím znovu.');

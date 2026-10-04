@@ -3,7 +3,6 @@ import { Truck, Package, Shield, MapPin, Phone, Mail, ArrowRight } from 'lucide-
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import MovingAnimation from '../components/MovingAnimation';
-import { trackGoogleAdsConversion } from '../configurator/services/analytics';
 import { submitContactForm } from '../services/contactSubmit';
 
 export default function EnglishMovingPage() {
@@ -84,9 +83,8 @@ export default function EnglishMovingPage() {
         timestamp: new Date().toISOString(),
       });
 
-      trackGoogleAdsConversion();
       form.reset();
-      setSubmitMessage('Thank you, your inquiry has been sent successfully.');
+      window.location.assign('/en/thank-you');
     } catch (error) {
       console.error('Failed to submit English contact form:', error);
       setSubmitMessage('Sending failed. Please try again.');
