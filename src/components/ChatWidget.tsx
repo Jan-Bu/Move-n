@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Bot, Calculator, Loader2, MessageCircle, Phone, Send, X } from 'lucide-react';
+import { Bot, Calculator, ClipboardList, Loader2, MessageCircle, Phone, Send, X } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import ChatQuoteForm from './ChatQuoteForm';
 
 type Language = 'cs' | 'en';
 type MessageRole = 'user' | 'assistant';
@@ -15,7 +16,7 @@ const translations = {
   cs: {
     title: 'MOVI-N asistent',
     status: 'Online pomoc se stěhováním',
-    greeting: 'Dobrý den! Jak vám mohu pomoci se stěhováním?',
+    greeting: 'Dobrý den! Jsem stěhovací asistent MOVI-N. Poradím s přípravou, službami i průběhem stěhování a můžeme spolu rovnou sestavit nezávaznou poptávku. Co potřebujete?',
     placeholder: 'Napište svůj dotaz…',
     send: 'Odeslat zprávu',
     open: 'Otevřít chat',
@@ -25,12 +26,15 @@ const translations = {
     privacy: 'Neposílejte citlivé údaje. Zprávu zpracovává AI.',
     estimate: 'Spočítat cenu',
     contact: 'Kontakt',
-    suggestions: ['Kolik stojí stěhování?', 'Stěhujete i do zahraničí?', 'Pomůžete mi s balením?'],
+    quote: 'Sestavit poptávku v chatu',
+    quoteSuccess: 'Děkuji, poptávka byla odeslána. Potvrzení jsme poslali na váš e-mail a tým MOVI-N se vám ozve s finální nabídkou.',
+    topics: 'Nejčastější dotazy',
+    suggestions: ['Chci se přestěhovat – co potřebujete vědět?', 'Jak probíhá stěhování?', 'Kolik stojí stěhování?', 'Pomůžete s balením a krabicemi?', 'Stěhujete těžké předměty?', 'Stěhujete i do zahraničí?', 'Jak se připravit před stěhováním?', 'Jste pojištění?'],
   },
   en: {
     title: 'MOVI-N assistant',
     status: 'Online moving assistance',
-    greeting: 'Hello! How can I help you with your move?',
+    greeting: 'Hello! I am the MOVI-N moving assistant. I can help with planning, services and the moving process, or we can prepare a non-binding request together. What do you need?',
     placeholder: 'Type your question…',
     send: 'Send message',
     open: 'Open chat',
@@ -40,7 +44,10 @@ const translations = {
     privacy: 'Do not send sensitive information. Messages are processed by AI.',
     estimate: 'Get an estimate',
     contact: 'Contact',
-    suggestions: ['How much does moving cost?', 'Do you move internationally?', 'Can you help with packing?'],
+    quote: 'Build my request in chat',
+    quoteSuccess: 'Thank you, your request has been sent. We emailed you a confirmation and the MOVI-N team will contact you with a final quote.',
+    topics: 'Popular questions',
+    suggestions: ['I am moving – what do you need to know?', 'How does the move work?', 'How much does moving cost?', 'Can you pack and supply boxes?', 'Do you move heavy items?', 'Do you move internationally?', 'How should I prepare?', 'Are you insured?'],
   },
 };
 
@@ -83,6 +90,7 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>(() => loadMessages(lang));
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [validationMessage, setValidationMessage] = useState('');
   const messageListRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -91,6 +99,7 @@ export default function ChatWidget() {
     setMessages(loadMessages(lang));
     setInput('');
     setValidationMessage('');
+    setIsQuoteOpen(false);
   }, [lang]);
 
   useEffect(() => {
@@ -181,6 +190,9 @@ export default function ChatWidget() {
     ? '/en/moving-services#moving-configurator-root'
     : '/#moving-configurator-root';
   const contactHref = lang === 'en' ? '/en/moving-services#contact' : '/#kontakt';
+  const transcript = messages
+    .map((message) => `${message.role === 'user' ? (lang === 'cs' ? 'Zákazník' : 'Customer') : 'MOVI-N'}: ${message.content}`)
+    .join('\n');
 
   return (
     <>
@@ -208,6 +220,20 @@ export default function ChatWidget() {
             </button>
           </header>
 
+          {isQuoteOpen ? (
+            <div className="min-h-0 flex-1">
+              <ChatQuoteForm
+                lang={lang}
+                transcript={transcript}
+                onCancel={() => setIsQuoteOpen(false)}
+                onSubmitted={() => {
+                  setIsQuoteOpen(false);
+                  setMessages((current) => [...current, createMessage('assistant', copy.quoteSuccess)]);
+                }}
+              />
+            </div>
+          ) : (
+          <>
           <div ref={messageListRef} className="flex-1 overflow-y-auto bg-green-50/40 px-4 py-4 space-y-3" aria-live="polite">
             {messages.map((message) => (
               <div
@@ -226,8 +252,10 @@ export default function ChatWidget() {
               </div>
             ))}
 
-            {messages.length === 1 && (
-              <div className="flex flex-wrap gap-2 pt-1">
+            {messages.length <= 3 && (
+              <div className="pt-1">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-green-800">{copy.topics}</p>
+                <div className="flex flex-wrap gap-2">
                 {copy.suggestions.map((suggestion) => (
                   <button
                     key={suggestion}
@@ -238,6 +266,7 @@ export default function ChatWidget() {
                     {suggestion}
                   </button>
                 ))}
+                </div>
               </div>
             )}
 
@@ -251,6 +280,17 @@ export default function ChatWidget() {
           </div>
 
           <div className="border-t border-green-100 bg-white px-3 pt-3">
+            <button
+              type="button"
+              onClick={() => {
+                setIsQuoteOpen(true);
+                window.gtag?.('event', 'chat_quote_started', { language: lang });
+              }}
+              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-800"
+            >
+              <ClipboardList className="h-4 w-4" aria-hidden="true" />
+              {copy.quote}
+            </button>
             <div className="grid grid-cols-2 gap-2 mb-3">
               <a
                 href={configuratorHref}
@@ -299,6 +339,8 @@ export default function ChatWidget() {
               <a href="/gdpr" className="underline hover:text-green-700">GDPR</a>
             </p>
           </div>
+          </>
+          )}
         </aside>
       )}
 

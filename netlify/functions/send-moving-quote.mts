@@ -25,6 +25,8 @@ type ElevatorType = 'elevator_1_3' | 'elevator_4_6' | 'elevator_7_9' | 'elevator
 
 interface QuoteRequest {
   lang: string;
+  source?: 'configurator' | 'chat';
+  name?: string;
   from: {
     address: string;
     elevator: boolean;
@@ -264,6 +266,7 @@ export default async (req: Request, context: Context) => {
           <h2 style="color: #166534; margin-top: 0;">${
             quote.lang === "cs" ? "Kontaktní údaje" : "Contact Information"
           }</h2>
+          ${quote.name ? `<p><strong>${quote.lang === "cs" ? "Jméno" : "Name"}:</strong> ${quote.name}</p>` : ""}
           <p><strong>Email:</strong> ${quote.email}</p>
           ${
             quote.phone
@@ -277,6 +280,7 @@ export default async (req: Request, context: Context) => {
           }:</strong> ${new Date(quote.timestamp).toLocaleString(
       quote.lang === "cs" ? "cs-CZ" : "en-US"
     )}</p>
+          <p><strong>${quote.lang === "cs" ? "Zdroj" : "Source"}:</strong> ${quote.source === "chat" ? "AI chat" : (quote.lang === "cs" ? "Konfigurátor" : "Configurator")}</p>
         </div>
 
         <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
