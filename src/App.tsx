@@ -8,6 +8,7 @@ import EnglishMovingPage from './pages/EnglishMovingPage';
 import GDPRPage from './pages/GDPRPage';
 import TermsPage from './pages/TermsPage';
 import ThankYouPage from './pages/ThankYouPage';
+import ChatWidget from './components/ChatWidget';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <BrowserRouter>
         <ScrollToTop />
         <CookieBanner />
+        <ChatWidget />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/en/moving-services" element={<EnglishMovingPage />} />
